@@ -1,0 +1,184 @@
+Docter
+
+profile picture.
+Degree.
+identitycard
+upload logo
+Address
+clinic licence
+Achievements
+video
+region
+Bank details
+
+
+
+My Apointments(Request/Cancelled/Upcoming/Emergency/reshedule/completed);15/video/chat    patient_id
+*Emergency slots
+*Note
+*prescription  (Name/Speciality/Date/Phonenumber/EmailID/Address/Logo/QR Code/Signature)
+*My patients
+
+
+My availability: days/date   Laboratory/ Pharmacy/ CNAM
+
+Payment
+*payment week
+
+
+Email and Push notification
+
+
+
+
+Patient
+*Populer docters
+*Phone 
+
+Acount setting
+List of docters
+Book apointment (docter apointment time comes from docter availability)
+*Book apointmets
+
+
+Payment.
+
+My consultations (Request/cancelled/Upcoming/Reshedule/Completed/Start Consultations)
+Category
+*Banners
+*search docter
+*stars
+*Convinient slots
+*Allergies.
+*Health record history
+*Duplicate profile
+*Commission
+*My Availability
+
+
+*Ui Reshedule
+*Docter as patient
+
+
+
+
+
+
+
+==================================  APIs discossion ==============================
+-> Docter
+                Name
+                Profile picture (upload)
+                Degree
+                Mobile number
+                Email ID 
+                password  (enter twice)
+                Doctor will click “Next” button after entering the above information & fill out the appeared form having below the fields as mentioned below:
+
+Question: Are you registration for any of the 3 specialities (Pharmacy/Lab oratory/CNAM) (select Yes/ No from the drop-down) 
+
+Identity Card (upload front & back)
+Doctor License (upload front & back)
+Upload logo (this logo would be appeared on the top of the prescriptions released by the doctor)
+Name & address of clinic
+Clinic license (upload front & back)
+Number of years into practice
+Achievements (if any)
+                     Read terms & conditions & click “Agree” button
+Upload/ edit profile picture 
+Upload Introductory Video (length of the video must be at least 1 minute)
+Select speciality from drop-down
+Select region from drop-down
+Enter Bank details
+Consultancy Charges: Doctors can set/ edit consultancy charges.
+Terms & Conditions (user can view the terms and conditions as agreed while registration)
+
+-> Patient
+               name,
+               picture, 
+               mobile number, 
+DoB,
+Gender, 
+Read terms & conditions & click “Agree” button
+            email ID
+                password 
+
+
+Tables
+-> User
+-> Docter_profile
+-> Availability    (docter_id, click_button, time, day, date)
+-> health_history
+-> Consultation    ( Junction tablr with patient_id, docter_id, apointment_id )
+   fields (Age, Full_name, date, time, status, )
+
+
+
+
+
+techlead
+jira
+
+//    Docter migrattion ///
+ npx sequelize-cli model:generate --name docter --attributes fullName:string,gender:enum:'{Male,female,Other}',email:string,password:string,photo:string,degree:string,isPharmacist:boolean,clinicName:string,clinicAddress:string,experience:integer,achivement:string,speciality:string,region:string,bank_details:string,consultCharge:integer
+
+//    Docter Info   //
+npx sequelize-cli model:generate --name docterInfo --attributes introVideo:string,licenseFront:string,licenseBack:string,identityCardFront:string,identityCardBack:string,clinicLicenseFront:string,clinicLicenceBack:string
+
+// patient Info //
+
+
+// appointment Info //
+npx sequelize-cli model:generate --name appointment --attributes date:date,time:date,patient_name:string,age:integer,gender:enum:'{Male,female,Other}',problem_desc:text,status:enum:'{Request,Cancelled,Upcoming,Reshedule,Emergency,Completed}'
+
+// banner //
+npx sequelize-cli model:generate --name banner --attributes image:string,link:integer
+
+// speciality //
+npx sequelize-cli model:generate --name speciality --attributes speciality:string,commission:integer
+
+// availability //
+npx sequelize-cli model:generate --name availability --attributes docter_id:integer,available:boolean,morning_start:date,morning_end:date,evening_start:date,evening_end:date,emergency:boolean,slots:date,slot_duration:date
+
+
+// slots //
+npx sequelize-cli model:generate --name slots --attributes morning_slots:date,isBooked:boolean,evening_slots:date,isBooked:boolean,
+
+
+var Otp = Math.floor((Math.random() * 1000000) + 1)
+console.log(Otp)
+
+
+var now = moment();
+var time = now.hour() + ':' + now.minutes() + ':' + now.seconds();
+console.log(time);
+
+time = time + ((now.hour()) >= 12 ? ' PM' : ' AM');
+console.log(time);
+
+
+setTimeout(async () => {
+                        console.log("Delayed for 1 second.");
+                      }, 1000)
+console.log("dans")
+
+
+Request -> Cancelled -> myApointments -> Aproveapointment -> Upcomingapointment
+
+<p>Your Brand Inc</p>
+            <p>1600 Amphitheatre Parkway</p>
+            <p>California</p>
+
+
+http://localhost:5000/api/users?page=2&limit=10
+http://localhost:5000/api/users
+http://localhost:5000/api/users?limit=10
+http://localhost:5000/api/users?page=2
+
+ const limit = _limit? +_limit : 20;
+    const offset = _page? _page * limit : 0;
+    const data = await _model.find().skip(offset).limit(limit);
+    return { limit, offset, data };
+
+
+SELECT A.name, A.phone, A.parent_id, B.parent_id FROM `patients` as A INNER join patients as B ON A.id = B.parent_id;
