@@ -51,7 +51,7 @@ exports.docterUpdate = async (req, res) => {
                     clinicLicenceBack: req.files.clinicLicenseBack[0].filename,
                     introVideo: req.files.introVideo[0].filename
                 }
-                await docterInfo.update(docs, {where: {docter_id: req.params.docterId}}, {transaction: t}).then(docterInfo => {
+                await docterInfo.update(docs, {where: {docter_id: req.profile.id}}, {transaction: t}).then(docterInfo => {
                     if (docterInfo.length) {
                         res.status(200).json({
                             message: "docter updated successfully",
