@@ -24,7 +24,7 @@ exports.docterregister = async (req, res) => {
           bcrypt.genSalt(10, (err, salt) => {
               bcrypt.hash(req.body.password, 10, async (err, hash) => {
                   req.body.password = hash
-                  req.body.photo = req.files.profilePicture[0].filename
+                  req.files? req.body.photo = req.files.profilePicture[0].filename : null
                   const t = await sequelize.transaction();
                       await docter.create(req.body, { transaction: t }).then(async result => {
                           let docs = {

@@ -21,20 +21,22 @@ exports.getdocter = async (req, res, next, id) => {
 
 
 exports.findById = async (req, res) => {
-    try {
-        return res.status(200).json({
-            success: true,
-            message: "Docter fetched successfully.",
-            Docter: req.Docter
+    await docter.findOne({where:{id : req.profile.id}, include: [{model: docterInfo}]}).then(docter => {
+        if (docter) {
+            res.status(200).json({
+                message: "Docter fetched successfully",
+                results: docter
+            })
+        } else {
+            throw Error
+        }
+       
+    }).catch(error =>{
+        res.status(400).json({
+            message: "Docter fetched successfully",
+            results: docter
         })
-    }
-    catch (error) {
-        return res.status(400).json({
-            success: false,
-            message: "Error fetching Docter.",
-            error: error
-        })
-    }
+    })
 }
 
 exports.docterUpdate = async (req, res) => {
