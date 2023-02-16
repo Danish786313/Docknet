@@ -1,4 +1,4 @@
-const { docter, sequelize, patient, docterInfo, admin,  } = require("../models")
+const { docter, sequelize, patient, docterInfo, admin, bankdetail } = require("../models")
 
 exports.getdocter = async (req, res, next, id) => {
     try {
@@ -21,7 +21,9 @@ exports.getdocter = async (req, res, next, id) => {
 
 
 exports.findById = async (req, res) => {
-    await docter.findOne({where:{id : req.profile.id}, include: [{model: docterInfo}]}).then(docter => {
+    await docter.findOne({
+        where:{id : req.profile.id}, 
+        include: [{model: docterInfo}, {model: bankdetail}]}).then(docter => {
         if (docter) {
             res.status(200).json({
                 message: "Docter fetched successfully",
@@ -91,7 +93,7 @@ exports.docterUpdate = async (req, res) => {
 
 
 exports.deleteDocter = async (req, res) => {
-    await docter.destroy({where: {id: req.params.docterId}}).then((docter) => {
+    await docter.destroy({where: {id: req.profile.id}}).then((docter) => {
         return res.status(200).json({
                message: "Docter deleted successfully",
                result: docter

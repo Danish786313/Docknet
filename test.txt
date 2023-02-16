@@ -182,3 +182,6 @@ http://localhost:5000/api/users?page=2
 
 
 SELECT A.name, A.phone, A.parent_id, B.parent_id FROM `patients` as A INNER join patients as B ON A.id = B.parent_id;
+
+
+npx sequelize-cli model:generate --name slots --attributes docter_id:integer,name:string,branchName:string,ifscCode:string,accountNo:string,accountType:enum:'{Current, Saving}'
