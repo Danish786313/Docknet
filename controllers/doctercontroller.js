@@ -41,18 +41,20 @@ exports.findById = async (req, res) => {
 
 exports.docterUpdate = async (req, res) => {
     await sequelize.transaction(async (t) => {
-        req.files.profilePicture ? req.body.photo = req.files.profilePicture[0].filename : null   
+        reqObj = req.files
+        Object.hasOwn(reqObj, 'profilePicture')?  req.body.photo = req.files.profilePicture[0].filename : null;
+        console.log(req.body)
         await docter.update(req.body, {where: {id: req.profile.id}}, {transaction: t}).then(async docter => {
+            console.log(docter)
             if (docter.length) {
-                let docs = {
-                    licenseFront: req.files.licenseFront[0].filename,
-                    licenseBack: req.files.licenseBack[0].filename,
-                    identityCardFront: req.files.identityCardFront[0].filename,
-                    identityCardBack: req.files.identityCardBack[0].filename,
-                    clinicLicenseFront: req.files.clinicLicenseFront[0].filename,
-                    clinicLicenceBack: req.files.clinicLicenseBack[0].filename,
-                    introVideo: req.files.introVideo[0].filename
-                }
+                docs = {}
+                Object.hasOwn(reqObj, 'licenseFront')?  docs.licenseFront = req.files.licenseFront[0].filename : null;
+                Object.hasOwn(reqObj, 'licenseBack')?  docs.licenseBack = req.files.licenseBack[0].filename : null;
+                Object.hasOwn(reqObj, 'identityCardFront')?  docs.identityCardFront = req.files.identityCardFront[0].filename : null;
+                Object.hasOwn(reqObj, 'identityCardBack')?  docs.identityCardBack = req.files.identityCardBack[0].filename : null;
+                Object.hasOwn(reqObj, 'clinicLicenseFront')?  docs.clinicLicenseFront = req.files.clinicLicenseFront[0].filename : null;
+                Object.hasOwn(reqObj, 'clinicLicenseBack')?  docs.clinicLicenceBack = req.files.clinicLicenseBack[0].filename : null;
+                Object.hasOwn(reqObj, 'introVideo')?  docs.introVideo = req.files.introVideo[0].filename : null;
                 await docterInfo.update(docs, {where: {docter_id: req.profile.id}}, {transaction: t}).then(docterInfo => {
                     if (docterInfo.length) {
                         res.status(200).json({
