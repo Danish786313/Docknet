@@ -10,7 +10,13 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       docter_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'docters',
+          key: 'id'
+        },
+        onDelete: 'cascade',
+        onUpdate: 'cascade'
       },
       name: {
         type: Sequelize.STRING
