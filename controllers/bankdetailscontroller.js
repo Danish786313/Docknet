@@ -58,15 +58,19 @@ exports.findOne = async (req, res) => {
 
 exports.update = async (req, res) => {
     await bankdetail.update(req.body, {where: {id: req.params.bankId}}).then(bankdetail => {
-        res.status(200).json({
-            success: true,
-            message: "bankdetail updated successfully",
-            result: bankdetail
-        })
+        // throw Error
+        if (bankdetail[0] != 0) {
+            res.status(200).json({
+                success: true,
+                message: "bankdetail updated successfully",
+                result: bankdetail
+            })
+        } else {
+            return Promise.reject("Please provide atlest one field to update")
+        }
     }).catch(error => {
-        res.status(400).json({
+        return res.status(400).json({
             success: false,
-            message: "Something went wrong while updaing bankdetail",
             Error: error
         })
     })
