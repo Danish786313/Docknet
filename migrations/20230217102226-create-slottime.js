@@ -2,24 +2,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('availabilities', {
+    await queryInterface.createTable('slottimes', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      docter_id: {
+      availability_id: {
         type: Sequelize.INTEGER
       },
-      available: {
-        type: Sequelize.BOOLEAN
-      },
-      date: {
+      start: {
         type: Sequelize.DATE
       },
-      emergency: {
-        type: Sequelize.BOOLEAN
+      end: {
+        type: Sequelize.DATE
+      },
+      slots: {
+        type: Sequelize.JSON
       },
       createdAt: {
         allowNull: false,
@@ -32,6 +32,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('availabilities');
+    await queryInterface.dropTable('slottimes');
   }
 };

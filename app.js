@@ -73,7 +73,7 @@ const port = (process.env.PORT || 4000)
 
 //Starting a server
 app.listen(port, async () => {
-    sequelize.sync().then(() => {
+    sequelize.sync(/* {alter: true} */).then(() => {
         console.log("Database connected")
     }).catch(() => {
         console.log("Database not connected")

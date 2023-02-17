@@ -185,3 +185,5 @@ SELECT A.name, A.phone, A.parent_id, B.parent_id FROM `patients` as A INNER join
 
 
 npx sequelize-cli model:generate --name slots --attributes docter_id:integer,name:string,branchName:string,ifscCode:string,accountNo:string,accountType:enum:'{Current, Saving}'
+
+npx sequelize-cli model:generate --name slot --attributes availability_id:integer,start:date,end:date,slots:json

@@ -7,7 +7,7 @@ router.param("bankId", bankdetaicontroller.getbankdetails)
 
 router.post("/bank", checkAuth.getLogedInUser, bankdetaicontroller.create)
 
-router.get("/bank/:bankId", checkAuth.getLogedInUser, bankdetaicontroller.findOne)
+router.get("/bank", checkAuth.getLogedInUser, bankdetaicontroller.findOne)
 
 router.patch("/bank/:bankId", checkAuth.getLogedInUser, bankdetaicontroller.update)
 
