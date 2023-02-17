@@ -73,11 +73,11 @@ const port = (process.env.PORT || 4000)
 
 //Starting a server
 app.listen(port, async () => {
-    // sequelize.sync({force: true}).then(() => {
-    //     console.log("Database connected")
-    // }).catch(() => {
-    //     console.log("Database not connected")
-    // })
+    sequelize.sync().then(() => {
+        console.log("Database connected")
+    }).catch(() => {
+        console.log("Database not connected")
+    })
     console.log(`Example app listening at http://localhost:${port}`)
     // console.log(`swagger url http://localhost:${port}/api-docs`)
 })
