@@ -236,9 +236,10 @@ exports.signupPatient = async (req, res) => {
                                   error: err
                                })
                       }
-                  }).catch(() => {
+                  }).catch((err) => {
                       res.status(400).json({
-                          message: "Something went wrong"
+                          message: "Something went wrong 5",
+                          Error: err.message
                       })                        
                   })
               })
@@ -269,11 +270,14 @@ exports.patientLogin = async (req, res) => {
                       email: user.email,
                       phone: user.phone
                   }, process.env.secret , {expiresIn: "365d"}, (err, token) => {
-                      return res.status(200).json({
-                          success: true,
-                          message: "Login Successful",
-                          token: token
-                      })
+                    user.Token = token
+                    user.save().then(() => {
+                        return res.status(200).json({
+                            success: true,
+                            message: "Login Successful",
+                            token: token
+                        })
+                    })
                   });
               } else {
                   return res.status(400).json({
