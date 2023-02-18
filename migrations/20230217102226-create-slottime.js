@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      availability_id: {
+      docter_id: {
         type: Sequelize.INTEGER
       },
       start: {

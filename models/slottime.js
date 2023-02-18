@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   slottime.init({
-    availability_id: DataTypes.INTEGER,
+    docter_id: DataTypes.INTEGER,
     start: DataTypes.DATE,
     end: DataTypes.DATE,
     slots: DataTypes.JSON

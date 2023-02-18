@@ -2,6 +2,12 @@ const { availability, slottime } = require("../models")
 const moment = require("moment")
 
 exports.CreateAvailability = async (req, res) => {
+    let available = await availability.findOne({where: { id: req.profile.id }})
+    if (available) {
+        return res.status(400).send({
+            message: "You have already created availability"
+        })
+    }
     req.body.docter_id = req.profile.id
     await availability.create(req.body).then(async (availability) => {
         res.status(200).json({
@@ -29,7 +35,7 @@ exports.createslots = async (req, res) => {
         }
     }
     post = {
-        availability_id: req.params.id,
+        // availability_id: req.params.id,
         start: moment(req.body.start, ['h:m', 'H:m']).format(),
         end: moment(req.body.end, ['h:m', 'H:m']).format(),
         slots: slots,
