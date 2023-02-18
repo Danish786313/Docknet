@@ -33,6 +33,7 @@ const patient = require("./routes/patientrout")
 const payment = require("./routes/paymentrout")
 const region = require("./routes/regionroute")
 const bankdetail = require("./routes/bankdetailrout")
+const slots = require("./routes/slotsrout")
 
 app.use(bodyParser.json())
 app.use(cookieParser());
@@ -58,6 +59,7 @@ app.use("/api", banner)
 app.use("/payment", payment)
 app.use("/api", region)
 app.use("/api", bankdetail)
+app.use("/api", slots)
 // app.use("/master/document", express.static("document"));
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + 'public/images'));
