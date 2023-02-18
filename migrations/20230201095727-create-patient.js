@@ -44,13 +44,13 @@ module.exports = {
       },
       parent_id: {
         type: Sequelize.INTEGER,
-        defaultValue: 0,
-        references: {
-          model: 'patients',
-          key: 'id'
-        },
-        onDelete: 'cascade',
-        onUpdate: 'cascade'
+        // defaultValue: 0,
+        // references: {
+        //   model: 'patients',
+        //   key: 'id'
+        // },
+        // onDelete: 'cascade',
+        // onUpdate: 'cascade'
       },
       createdAt: {
         allowNull: false,

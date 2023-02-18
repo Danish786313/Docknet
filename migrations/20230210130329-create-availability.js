@@ -12,6 +12,9 @@ module.exports = {
       docter_id: {
         type: Sequelize.INTEGER
       },
+      days: {
+        type: Sequelize.JSON
+      },
       available: {
         type: Sequelize.BOOLEAN
       },
