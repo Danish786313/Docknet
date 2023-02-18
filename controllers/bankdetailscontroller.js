@@ -45,15 +45,17 @@ exports.create = async (req, res) => {
 exports.findOne = async (req, res) => {
     await bankdetail.findOne({where: {docter_id: req.profile.id}}).then(data => {
         if (data) {
-             res.status(200).json({
+            return res.status(200).json({
                 message: "bankdetail fetched successfully",
                 result: data
             })
         } else {
-            throw Error
+            return res.status(400).json({
+                message: "Bank details does not exist",
+            })
         }      
     }).catch(err => {
-        res.status(400).json({
+        return res.status(400).json({
             message: "Error while feching bankdetails",
             result: err.message
         })
