@@ -3,7 +3,7 @@ const router = express.Router()
 const apointmentController = require("../controllers/apointmentcontroller")
 const checkOuth = require("../middleware/check-auth")
 
-router.post("/apointment", checkOuth.getLogedInUser, apointmentController.createApointment)
+router.post("/apointment", checkOuth.getLogedInPatient, apointmentController.createApointment)
 
 router.get("/apointment", checkOuth.getLogedInUser, apointmentController.apointments)
 

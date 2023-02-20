@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.DATE
       },
       time: {
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       patient_name: {
         type: Sequelize.STRING

@@ -24,7 +24,7 @@ exports.CreateAvailability = async (req, res) => {
 exports.getAvailability = async (req, res) => {
     await availability.findOne({ where: {docter_id: req.profile.id}}).then((data) => {
         res.status(200).json({
-            message: "Availability updated successfully",
+            message: "Availability fetched successfully",
             result: data
         })
     }).catch((err) => {

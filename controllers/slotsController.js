@@ -26,9 +26,11 @@ exports.createslots = async (req, res) => {
             slots.push(start.format('HH:mm'))
             start.add(parseInt(req.body.period), 'm')
         } else {
+            slots.push(start.format('HH:mm'))
             break
         }
     }
+    console.log(slots)
     post = {
         docter_id : req.profile.id,
         start: moment(req.body.start, ['h:m', 'H:m']).format(),
