@@ -1,3 +1,5 @@
+update and delete by params
+
 Docter
 
 profile picture.
@@ -195,3 +197,173 @@ npx sequelize-cli model:generate --name slot --attributes availability_id:intege
         // })
         // res.send(apointment)
         return
+
+
+// console.log(req.profile.docterInfo/* .logo.split('/').slice(-1).toString() */)
+
+
+   
+    // doc.image(path.join(__dirname, '../upload/1676463202488.png'), 50, 45, { width: 50 })
+    //     .fillColor('#444444')
+    //     .fontSize(20)
+    //     .text('ACME Inc.', 110, 57)
+    //     .fontSize(10)
+    //     .text('123 Main Street', 200, 65, { align: 'right' })
+    //     .text('New York, NY, 10025', 200, 80, { align: 'right' })
+    //     .moveDown();
+     const distanceMargin = 18;
+     squre
+    doc
+        .fillAndStroke('#0e8cc3')
+        .lineWidth(20)
+        .lineJoin('round')
+        .rect(
+            distanceMargin,
+            distanceMargin,
+            doc.page.width - distanceMargin * 2,
+            doc.page.height - distanceMargin * 2,
+            )
+            .stroke();
+
+
+//  Prescription setting  //
+npx sequelize-cli model:generate --name prescription_setting --attributes logo:json,name:json,speciality:json,title:json,cname:json,email:json,address:json,phone:json,patient:json,date:json,description:json
+
+
+
+{
+    "logo": {
+        "horizonAlign": 50,
+        "verticalAlign":  45,
+        "width": 100,
+        "heigth": 100
+    },
+    "qrCode": {
+        "horizonAlign": 460,
+        "verticalAlign":  45,
+        "width": 100,
+        "heigth": 100
+    },
+    "name": "Danish khan",
+    "speciality": "Dentist",
+    "title": "Prescription",
+    "cname": "084cdj@139",
+    "email": "Danishkhan123@gmail.com",
+    "address": "H No.2 Aishbagh Bhopal madhya pradesh",
+    "phone": "765083458",
+    "patient": "Antonio",
+    "description":  "A Prescription is a written document from a Registered Medical Practitioner or other licensed practitioner, such as Dentist, with instructions to the pharmacist for dispensing a specific type and quantity of medication to a patient. A prescription is an important document for establishing a diagnosis, starting the treatment, tracking the recovery and determining future treatment path of the patient. Therefore, it is very important that you understand what all a valid prescription should have.",
+       
+    "signature": {
+        "horizonAlign": 460,
+        "verticalAlign":  680,
+        "width": 100,
+        "heigth": 100
+    }
+}
+
+/// pay load data
+{
+    "logo": {
+        "horizonAlign": 50,
+        "verticalAlign":  45,
+        "width": 100,
+        "heigth": 100
+    },
+    "qrCode": {
+        "horizonAlign": 460,
+        "verticalAlign":  45,
+        "width": 100,
+        "heigth": 100
+    },
+    "name": {
+        "width": 50,
+        "height": 190,
+        "color": "skyblue",
+        "font": "Times-Italic",
+        "fontSize": 24
+    },
+    "speciality": {
+        "width": 50,
+        "height": 215,
+        "color": "black",
+        "font": "Courier",
+        "fontSize": 14
+    },
+    "title": {
+        "titleName": "Prescription",
+        "width": 210,
+        "height": 45,
+        "color": "#0e8cc3",
+        "font": "Courier-Bold",
+        "fontSize": 24
+    },
+    "cname": {
+        "cname": "084cdj@139",
+        "width": 260,
+        "height": 70,
+        "color": "black",
+        "font": "Courier",
+        "fontSize": 10
+    },
+    "email": {
+        "width": 360,
+        "height": 190,
+        "color": "black",
+        "font": "Courier",
+        "fontSize": 12
+    },
+    "address": {
+        "width": 360,
+        "height": 210,
+        "color": "black",
+        "font": "Courier",
+        "fontSize": 12
+    },
+    "phone": {
+        "width": 360,
+        "height": 200,
+        "color": "black",
+        "font": "Courier",
+        "fontSize": 12
+    },
+    "patient": {
+        "patientName": "Antonio",
+        "width": 50,
+        "height": 280,
+        "color": "black",
+        "font": "Courier",
+        "fontSize": 20
+    },
+    "date": {
+        "width": 50,
+        "height": 670,
+        "color": "black",
+        "font": "Courier",
+        "fontSize": 16
+    },
+    "line": {
+        "height": 250,
+        "start": 50,
+        "end": 565,
+        "color": "021c27" 
+    },
+    "description": {
+        "descriptionNote" : "A Prescription is a written document from a Registered Medical Practitioner or other licensed practitioner, such as Dentist, with instructions to the pharmacist for dispensing a specific type and quantity of medication to a patient. A prescription is an important document for establishing a diagnosis, starting the treatment, tracking the recovery and determining future treatment path of the patient. Therefore, it is very important that you understand what all a valid prescription should have.",
+        "width": 50,
+        "height": 320,
+        "color": "black",
+        "font": "Courier",
+        "fontSize": 14
+    },
+    "signature": {
+        "horizonAlign": 460,
+        "verticalAlign":  680,
+        "width": 100,
+        "heigth": 100
+    }
+}
+
+
+// review 
+npx sequelize-cli model:generate --name review --attributes patient_id:integer,docter_id:integer,stars:integer

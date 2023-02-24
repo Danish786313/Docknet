@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     fullName: DataTypes.STRING,
     gender: DataTypes.ENUM('Male', 'female', 'Other'),
     email: DataTypes.STRING,
+    phone: DataTypes.STRING,
     password: DataTypes.STRING,
     Token: DataTypes.STRING,
     reset_password: DataTypes.STRING,

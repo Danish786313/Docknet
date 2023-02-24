@@ -21,6 +21,9 @@ module.exports = {
         onDelete: 'cascade',
         onUpdate: 'cascade'
       },
+      logo: {
+        type: Sequelize.STRING
+      },
       introVideo: {
         type: Sequelize.STRING
       },

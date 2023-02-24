@@ -29,6 +29,7 @@ exports.docterregister = async (req, res) => {
                       await docter.create(req.body, { transaction: t }).then(async result => {
                           let docs = {
                               docter_id: result.id,
+                              logo: req.files.logo[0].filename,
                               licenseFront: req.files.licenseFront[0].filename,
                               licenseBack: req.files.licenseBack[0].filename,
                               identityCardFront: req.files.identityCardFront[0].filename,

@@ -24,7 +24,7 @@ var upload = multer({
     limits:{
         fieldSize: 1024 * 1024 * 10
     },
-    // fileFilter: fileFilter
+    fileFilter: fileFilter
 })
 
 module.exports = {

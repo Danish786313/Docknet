@@ -34,6 +34,8 @@ const payment = require("./routes/paymentrout")
 const region = require("./routes/regionroute")
 const bankdetail = require("./routes/bankdetailrout")
 const slots = require("./routes/slotsrout")
+const prescription = require("./routes/Prescriptionrout")
+const review = require("./routes/reviewrout")
 
 app.use(bodyParser.json())
 app.use(cookieParser());
@@ -60,11 +62,13 @@ app.use("/payment", payment)
 app.use("/api", region)
 app.use("/api", bankdetail)
 app.use("/api", slots)
+app.use("/api", prescription)
+app.use("/api", review)
 // app.use("/master/document", express.static("document"));
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + 'public/images'));
 
-app.use("/", (req, res) => {
+app.use("/razorpay", (req, res) => {
     res.render('pages/index', { 
 		title: 'Donate for Animals'
 	});
@@ -75,11 +79,11 @@ const port = (process.env.PORT || 4000)
 
 //Starting a server
 app.listen(port, async () => {
-    sequelize.sync(/* {force: true} */).then(() => {
-        console.log("Database connected")
-    }).catch(() => {
-        console.log("Database not connected")
-    })
+    // sequelize.sync({alter: true}).then(() => { 
+    //     console.log("Database connected")
+    // }).catch(() => { 
+    //     console.log("Database not connected")
+    // })
     console.log(`Example app listening at http://localhost:${port}`)
     // console.log(`swagger url http://localhost:${port}/api-docs`)
 })

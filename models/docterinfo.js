@@ -16,6 +16,13 @@ module.exports = (sequelize, DataTypes) => {
   }
   docterInfo.init({
     docter_id: DataTypes.INTEGER,
+    logo: {
+      type: DataTypes.STRING,
+      get() {
+        const imageName = this.getDataValue('logo');
+        return process.env.BACKEND_BASE_URL + '/' + imageName;
+      }
+    },
     introVideo: {
       type: DataTypes.STRING,
       get() {

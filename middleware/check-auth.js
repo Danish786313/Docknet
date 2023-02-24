@@ -1,4 +1,4 @@
-const { docter, patient } = require("../models")
+const { docter, patient, docterInfo } = require("../models")
 const jwt = require("jsonwebtoken")
 
 exports.getLogedInUser =  async (req, res, next) => {
@@ -12,7 +12,7 @@ exports.getLogedInUser =  async (req, res, next) => {
               message: "Invalid token provided"
             })
         }
-        await docter.findOne({ where : {id : decodedToken.id }}).then(user => {
+        await docter.findOne({ where : {id : decodedToken.id }, include: [{model: docterInfo}]}).then(user => {
             if(user){
               req.profile = user
               next()

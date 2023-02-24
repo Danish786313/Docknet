@@ -8,6 +8,7 @@ router.param("docterId", doctercontroller.getdocter);
 
 router.patch('/docter', checkAuth.getLogedInUser, multer.upload.fields(
     [
+        {name: "logo", maxCount: 1},
         {name: "profilePicture", maxCount:1}, 
         {name: "licenseFront", maxCount:1},
         {name: "licenseBack", maxCount:1},

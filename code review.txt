@@ -1,8 +1,0 @@
-14/2/2023
-
-1. otp table , add attributes like token in admin                                    |
-2. remove city                                                                       |Done
-3. try to handel without using cath after model operations                           |
-4. use try catch and transaction rollback in catch of try only                       |
-5. save token after signup if your application is one one user login in one device   |
-6. use constants                                                                     |

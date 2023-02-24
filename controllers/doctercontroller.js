@@ -49,6 +49,7 @@ exports.docterUpdate = async (req, res) => {
             console.log(docter)
             if (docter.length) {
                 docs = {}
+                reqObj.logo? docs.logo = req.files.logo[0].filename : null
                 reqObj.licenseFront? docs.licenseFront = req.files.licenseFront[0].filename : null;
                 reqObj.licenseBack? docs.licenseBack = req.files.licenseBack[0].filename : null;
                 reqObj.identityCardFront? docs.identityCardFront = req.files.identityCardFront[0].filename : null;

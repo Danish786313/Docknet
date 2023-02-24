@@ -4,7 +4,7 @@ const authcontroller = require("../controllers/authcontroller")
 const multer = require("../middleware/upload-docs")
 
 
-router.post("/register", multer.upload.fields([ {name: "profilePicture", maxCount:1 },  {name: "licenseFront", maxCount:1}, {name: "licenseBack", maxCount:1}, {name: "identityCardFront", maxCount:1}, {name: "identityCardBack", maxCount:1}, {name: "clinicLicenseFront", maxCount:1}, {name: "clinicLicenseBack", maxCount:1}]), authcontroller.docterregister);
+router.post("/register", multer.upload.fields([ {name: "logo", maxCount:1}, {name: "profilePicture", maxCount:1 },  {name: "licenseFront", maxCount:1}, {name: "licenseBack", maxCount:1}, {name: "identityCardFront", maxCount:1}, {name: "identityCardBack", maxCount:1}, {name: "clinicLicenseFront", maxCount:1}, {name: "clinicLicenseBack", maxCount:1}]), authcontroller.docterregister);
 
 router.get("/approve", authcontroller.aproveDocter);
 
