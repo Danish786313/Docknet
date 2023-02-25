@@ -1,4 +1,6 @@
 const { docter, sequelize, patient, docterInfo, admin,  } = require("../models")
+const { SUCCESS, FAIL } = require("../helper/constants")
+const Response = require("../helper/response")
 const bcrypt = require("bcrypt")
 var nodemailer = require("nodemailer");
 const ejs = require("ejs")
@@ -91,52 +93,52 @@ exports.docterregister = async (req, res) => {
 }
 
 exports.aproveDocter = async (req, res) => {
-  await docter.findOne({where: {email: req.query.email }}).then(async result => {
-      if (result) {
-          await docter.update({is_aprove: true}, {where: {email: req.query.email}}).then(update => {
-              try {
-                      ejs.renderFile(path.join(__dirname, "../views/profileaprove.ejs"), {
-                        name: result.fullName
-                      }).then(async template => {
-                              transporter.sendMail({
-                                  to: req.query.email,
-                                  from: "Docknet",
-                                  subject: "Your profile has been approved by Admin",
-                                  html: template
-                              }).then(async email => {
-                                  return res.status(200).json({
-                                      message: "Email sent",
-                                      Email: email
-                                  })
-                              }).catch(async (err) => {
-                                  return res.status(400).json({
-                                      message: "Something went wrong",
-                                      error: err
-                                  })
-                              });
-                      }).catch(async (err) =>  { 
-                           return res.status(400).json({
-                              message: "Something went wrong",
-                              error: err
-                           })
-                      })
-                  } catch (err) {
-                      return res.status(400).json({
-                          success: true,
-                          message: "Docter Approved Successfully"
-                      })
-                  }
-          }).catch(err => {
-              return res.status(400).json({
-                  success: true,
-                  message: "Docter Approved Successfully"
-              })
-          });
-      } else {
-          return res.status(400).json({
-              message: "Email does not exist",
-          })
-      }
+    await docter.findOne({where: {email: req.query.email }}).then(async result => {
+        if (result) {
+            await docter.update({is_aprove: true}, {where: {email: req.query.email}}).then(update => {
+                try {
+                        ejs.renderFile(path.join(__dirname, "../views/profileaprove.ejs"), {
+                          name: result.fullName
+                        }).then(async template => {
+                                transporter.sendMail({
+                                    to: req.query.email,
+                                    from: "Docknet",
+                                    subject: "Your profile has been approved by Admin",
+                                    html: template
+                                }).then(async email => {
+                                    return res.status(200).json({
+                                        message: "Email sent",
+                                        Email: email
+                                    })
+                                }).catch(async (err) => {
+                                    return res.status(400).json({
+                                        message: "Something went wrong",
+                                        error: err
+                                    })
+                                });
+                        }).catch(async (err) =>  { 
+                             return res.status(400).json({
+                                message: "Something went wrong",
+                                error: err
+                             })
+                        })
+                    } catch (err) {
+                        return res.status(400).json({
+                            success: true,
+                            message: "Docter Approved Successfully"
+                        })
+                    }
+            }).catch(err => {
+                return res.status(400).json({
+                    success: true,
+                    message: "Docter Approved Successfully"
+                })
+            });
+        } else {
+            return res.status(400).json({
+                message: "Email does not exist",
+            })
+        }
   }).catch(err => {
       return res.status(400).json({
           message: "Email does not exist",
@@ -189,193 +191,265 @@ exports.docterLogin = async (req, res) => {
 
 
 exports.signupPatient = async (req, res) => {
-  await patient.findOne({where: {email: req.body.email }}).then(async result => {
-      if (!result) {
-          bcrypt.genSalt(10, (err, salt) => {
-              bcrypt.hash(req.body.password, salt, async (err, hash) => {
-                  req.body.password = hash;
-                  let Otp = Math.floor((Math.random() * 1000000) + 1).toString();
-                  req.body.otp = Otp;
-                  req.body.isVerified = false;
-                  req.file?req.body.profilePicture = req.file.filename: null;
-                  const t = await sequelize.transaction();
-                  await patient.create(req.body, { transaction: t }).then(async result => { 
-                      try {
-                          ejs.renderFile(path.join(__dirname, "../views/verifyOtp.ejs"), {
-                              otp: req.body.otp,
-                              name: req.body.name,
-                          }).then(async template => {
-                                  transporter.sendMail({
-                                      to: req.body.email,
-                                      from: "kolonizer",
-                                      subject: "Verify Otp",
-                                      html: template
-                                  }).then(async email => {
-                                      await t.commit();
-                                      return res.status(200).json({
-                                          message: "Email sent",
-                                          Email: email
-                                      })
-                                  }).catch(async (err) => {
-                                      await t.rollback();
-                                      return res.status(400).json({
-                                          message: "Something went wrong",
-                                          error: err
-                                      })
-                                  });
-                          }).catch(async (err) =>  {
-                              await t.rollback();
-                               return res.status(400).json({
-                                  message: "Something went wrong",
-                                  error: err
-                               })
-                          })
-                      } catch (err) {
-                               await t.rollback();
-                               return res.status(400).json({
-                                  message: "Something went wrong",
-                                  error: err
-                               })
-                      }
-                  }).catch((err) => {
-                      res.status(400).json({
-                          message: "Something went wrong 5",
-                          Error: err.message
-                      })                        
-                  })
-              })
-          })
-      }else{
-          return res.status(400).json({
-              message: "Email already exist",
-          })
-      }
-  })
+    await patient.findOne({where: {email: req.body.email }}).then(async result => {
+        if (!result) {
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(req.body.password, salt, async (err, hash) => {
+                    req.body.password = hash;
+                    let Otp = Math.floor((Math.random() * 1000000) + 1).toString();
+                    req.body.otp = Otp;
+                    req.body.isVerified = false;
+                    req.file?req.body.profilePicture = req.file.filename: null;
+                    const t = await sequelize.transaction();
+                    await patient.create(req.body, { transaction: t }).then(async result => { 
+                        try {
+                            ejs.renderFile(path.join(__dirname, "../views/verifyOtp.ejs"), {
+                                otp: req.body.otp,
+                                name: req.body.name,
+                            }).then(async template => {
+                                    transporter.sendMail({
+                                        to: req.body.email,
+                                        from: "kolonizer",
+                                        subject: "Verify Otp",
+                                        html: template
+                                    }).then(async email => {
+                                        await t.commit();
+                                        return Response.successResponseWithoutData(
+                                          res,
+                                          "Successfully Send email to verifying account",
+                                          SUCCESS
+                                        )
+                                    }).catch(async (err) => {
+                                        await t.rollback();
+                                        return Response.errorResponseWithoutData(
+                                            res,
+                                            "Something went wrong.",
+                                            FAIL
+                                        ) 
+                                    });
+                            }).catch(async (err) =>  {
+                                await t.rollback();
+                                return Response.errorResponseWithoutData(
+                                    res,
+                                    "Something went wrong.",
+                                    FAIL
+                                ) 
+                            })
+                        } catch (err) {
+                                await t.rollback();
+                                return Response.errorResponseWithoutData(
+                                    res,
+                                    "Something went wrong.",
+                                    FAIL
+                                ) 
+                        }
+                    }).catch(async (err) => {
+                        await t.rollback();
+                        return Response.errorResponseWithoutData(
+                            res,
+                            "Something went wrong.",
+                            FAIL
+                        )                     
+                    })
+                })
+            })
+        }else{
+            return Response.errorResponseWithoutData(
+                res,
+                "Email Already exists",
+                FAIL
+            )
+        }
+    })
 }
 
 
 exports.patientLogin = async (req, res) => {
-  await patient.findOne({where: {email: req.body.email }}).then(async user => {
-      if (user) {
-          if (user.isVerified == false) {
-              return res.status(400).json({
-                  success: false,
-                  message: "Please verify your email address"
-              })
-          }
-
-          bcrypt.compare(req.body.password, user.password, (err, result) => {
-              if (result) {
-                  jwt.sign({
-                      id: user.id,
-                      email: user.email,
-                      phone: user.phone
-                  }, process.env.secret , {expiresIn: "365d"}, (err, token) => {
-                    user.Token = token
-                    user.save().then(() => {
-                        return res.status(200).json({
-                            success: true,
-                            message: "Login Successful",
-                            token: token
-                        })
-                    })
-                  });
-              } else {
-                  return res.status(400).json({
-                      success: false,
-                      message: "Invalid Password"
-                  })
-              }
-          });
-      } else {
-          return res.status(400).json({
-              message: "Email does not exist",
-          })
-      }
-  })
+    await patient.findOne({where: {email: req.body.email }}).then(async user => {
+        if (user) {
+            if (user.isVerified == false) {
+                return Response.errorResponseWithoutData(
+                    res,
+                    "Invalid Password provided",
+                    FAIL
+                )
+            }
+            bcrypt.compare(req.body.password, user.password, (err, result) => {
+                if (result) {
+                    jwt.sign({
+                        id: user.id,
+                        email: user.email,
+                        phone: user.phone
+                    }, process.env.secret , {expiresIn: "365d"}, (err, token) => {
+                        user.Token = token
+                        user.save().then(() => {
+                            let User = {}
+                            User = user
+                            User.token = token
+                            return Response.successResponseData(
+                                res,
+                                User,
+                                SUCCESS,
+                                "Successfully Send email to verifying account"
+                            )
+                      })
+                    });
+                } else {
+                    return Response.errorResponseWithoutData(
+                        res,
+                        "Invalid Password provided",
+                        FAIL
+                    )
+                }
+            });
+        } else {
+            return Response.errorResponseWithoutData(
+                res,
+                "Email does not exist",
+                FAIL
+            )
+        }
+    })
 }
 
 
 exports.verifyOtp = async (req, res) => {
-  await patient.findOne({where: { email: req.query.email, otp: req.query.otp}}).then(async otp => {
-      if (otp) {
-          await patient.update({isVerified: true}, {where :{email: req.query.email}}).then(() => {
-              res.status(200).json({
-                  success: true,
-                  message: "OTP Verified"
-              })
-          })
-      } else {
-          return res.status(400).json({
-              message: "Invalid OTP"
-          })
-      }
-  }).catch(err => {
-      return res.status(400).json({
-          message: "Something went wrong",
-          error: err
-      })
-  });
+    await patient.findOne({where: { email: req.query.email, otp: req.query.otp}}).then(async otp => {
+        if (otp) {
+            await patient.update({isVerified: true}, {where :{email: req.query.email}}).then(() => {
+                return Response.successResponseWithoutData(
+                    res,
+                    
+                )
+                res.status(200).json({
+                    success: true,
+                    message: "OTP Verified"
+                })
+            })
+        } else {
+            return res.status(400).json({
+                message: "Invalid OTP"
+            })
+        }
+    }).catch(err => {
+        return res.status(400).json({
+            message: "Something went wrong",
+            error: err
+        })
+    });
 }
 
 
-exports.changePassword = async (req, res) => {
+exports.changePasswordDocter = async (req, res) => {
   try {
-      crypto.randomBytes(32, (err, buffer) => {
-          if (err) {
-              console.log(err);
-          }
-          const token = buffer.toString("hex")
-          if (req.body.roll == "admin") {
-              admin.findOne({
-                  where: {
-                      [Op.or]: [
-                          { email: req.body.email },
-                      ]
-                  }
-              }).then(users => {
-                  if (!users) {
-                      res.status(404).json({
-                          success: false,
-                          message: "Invalid Username Please try With Valid UserName"
-                      });
-                      return "Mismacth";
-                  }
-                  else {
-                      var tokenmon = Math.floor((Math.random() * 1000000) + 1)
-                      // users.expireToken = Date.now() + 3600000
-                      users.reset_password = tokenmon
-                      console.log(users)
-                      users.save().then((result) => {
-                          ejs.renderFile(path.join(__dirname, "../views/resetPassword.ejs"),
-                              {
-                                  userName: admin.name,
-                                  token: tokenmon,
-                                  // url: process.env.FRONTEND_BASE_URL
-                              })
-                              .then(emailTemplate => {
-                                  transporter.sendMail({
-                                      to: users.email,
-                                      from: 'kolonizer',
-                                      subject: "Password Reset",
-                                      html: emailTemplate
-                                  })
-                              })
-                          res.status(200).json({
-                              success: true,
-                              message: "Successfully send reset-password-link mail"
-                          })
-                      })
-                  }
-              })
-          } else if (req.body.roll == "doctor" ) {
-              docter.findOne({
-                  where: {
-                      [Op.or]: [
-                          { email: req.body.email },
-                      ]
-                  }
-              }).then(users => {
+        crypto.randomBytes(32, (err, buffer) => {
+            if (err) {
+                console.log(err);
+            }
+            const token = buffer.toString("hex")
+            docter.findOne({
+              where: {
+                  [Op.or]: [
+                      { email: req.body.email },
+                  ]
+              }
+           }).then(users => {
+                if (!users) {
+                    res.status(404).json({
+                        success: false,
+                        message: "Invalid Username Please try With Valid UserName"
+                    });
+                    return "Mismacth";
+                }
+                else {
+                    var tokenmon = Math.floor((Math.random() * 1000000) + 1).toString()
+                    users.reset_password = tokenmon
+                    users.save().then((result) => {
+                        ejs.renderFile(path.join(__dirname, "../views/resetPassword.ejs"),
+                            {
+                                userName: users.name,
+                                token: tokenmon,
+                                // url: process.env.FRONTEND_BASE_URL
+                            })
+                            .then(emailTemplate => {
+                                transporter.sendMail({
+                                    to: users.email,
+                                    from: 'kolonizer',
+                                    subject: "Password Reset",
+                                    html: emailTemplate
+                                })
+                            })
+                        res.status(200).json({
+                            success: true,
+                            message: "Successfully send reset-password-link mail"
+                        })
+                    })
+                }
+          })  
+        })
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: "Failed to reset Password.",
+            error: error
+        })
+    }
+}
+
+exports.newPasswordDocter = async (req, res) => {
+    try {
+        const newPassword = req.body.newPassword
+        const otp = req.body.otp
+        docter.findOne({ where: { reset_password: otp } }).then(user => {
+            if (!user) {
+                return res.status(422).json({
+                    message: "user reset Otp not existe"
+                })
+            }
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(newPassword, 10, async (err, hash) => {
+                    // user.reset_password = null
+                    user.password = hash
+                    user.save().then((saveduser) => {
+                        res.json({
+                            message: "Password Updated success"
+                        })
+                    })
+                })
+            })
+        }).catch(err => {
+           return Response.errorResponseData(
+            res,
+            "Failed to send reset-password",
+            req
+           )
+        })
+    } catch (err) {
+        console.log(err)
+        return Response.errorResponseData(
+            res,
+            "Something went wrong",
+            req
+        )
+    }
+}
+
+
+// patient 
+exports.changePasswordPatient = async (req, res) => {
+    try {
+          crypto.randomBytes(32, (err, buffer) => {
+              if (err) {
+                  console.log(err);
+              }
+              const token = buffer.toString("hex")
+              patient.findOne({
+                where: {
+                    [Op.or]: [
+                        { email: req.body.email },
+                    ]
+                }
+             }).then(users => {
                   if (!users) {
                       res.status(404).json({
                           success: false,
@@ -385,7 +459,6 @@ exports.changePassword = async (req, res) => {
                   }
                   else {
                       var tokenmon = Math.floor((Math.random() * 1000000) + 1).toString()
-                      // users.expireToken = Date.now() + 3600000
                       users.reset_password = tokenmon
                       users.save().then((result) => {
                           ejs.renderFile(path.join(__dirname, "../views/resetPassword.ejs"),
@@ -408,139 +481,56 @@ exports.changePassword = async (req, res) => {
                           })
                       })
                   }
-              })
-          } else {
-              patient.findOne({
-                  where: {
-                      [Op.or]: [
-                          { email: req.body.email },
-                      ]
-                  }
-              }).then(users => {
-                  if (!users) {
-                      res.status(404).json({
-                          success: false,
-                          message: "Invalid Username Please try With Valid UserName"
-                      });
-                      return "Mismacth";
-                  }
-                  else {
-                      var tokenmon = Math.floor((Math.random() * 1000000) + 1).toString()
-                      // users.expireToken = Date.now() + 3600000
-                      users.reset_password = tokenmon
-                      console.log(users)
-                      users.save().then((result) => {
-                          ejs.renderFile(path.join(__dirname, "../views/resetPassword.ejs"),
-                              {
-                                  userName: admin.name,
-                                  token: tokenmon,
-                                  // url: process.env.FRONTEND_BASE_URL
-                              })
-                              .then(emailTemplate => {
-                                  transporter.sendMail({
-                                      to: users.email,
-                                      from: 'kolonizer',
-                                      subject: "Password Reset",
-                                      html: emailTemplate
-                                  })
-                              })
-                          res.status(200).json({
-                              success: true,
-                              message: "Successfully send reset-password-link mail"
+            })  
+          })
+      } catch (error) {
+          return res.status(400).json({
+              success: false,
+              message: "Failed to reset Password.",
+              error: error
+          })
+      }
+  }
+  
+
+  // patient
+  exports.newPasswordPatient = async (req, res) => {
+      try {
+          const newPassword = req.body.newPassword
+          const otp = req.body.otp
+          patient.findOne({ where: { reset_password: otp } }).then(user => {
+              if (!user) {
+                  return res.status(422).json({
+                      message: "user reset Otp not existe"
+                  })
+              }
+              bcrypt.genSalt(10, (err, salt) => {
+                  bcrypt.hash(newPassword, 10, async (err, hash) => {
+                      // user.reset_password = null
+                      user.password = hash
+                      user.save().then((saveduser) => {
+                          res.json({
+                              message: "Password Updated success"
                           })
                       })
-                  }
+                  })
               })
-          }
-         
-      })
-
-  } catch (error) {
-      return res.status(400).json({
-          success: false,
-          message: "Failed to reset Password.",
-          error: error
-      })
+          }).catch(err => {
+             return Response.errorResponseData(
+              res,
+              "Failed to send reset-password",
+              req
+             )
+          })
+      } catch (err) {
+          console.log(err)
+          return Response.errorResponseData(
+              res,
+              "Something went wrong",
+              req
+          )
+      }
   }
-}
-
-exports.newPassword = async (req, res) => {
-  const newPassword = req.body.newPassword
-  const otp = req.body.otp
-  if (req.body.roll == "admin") {
-      admin.findOne({
-          where: { reset_password: otp }
-      }).then(user => {
-          if (!user) {
-              return res.status(422).json({
-                  message: "user reset Otp not existe 4"
-  
-              })
-          }
-          bcrypt.genSalt(10, (err, salt) => {
-              bcrypt.hash(newPassword, 10, async (err, hash) => {
-                  user.reset_password = null
-                  user.save().then((saveduser) => {
-                      res.json({
-                          message: "Password Updated success"
-                      })
-                  })
-              })
-          })
-      }).catch(err => {
-          console.log(err);
-      })
-  } else if (req.body.roll == "doctor") {
-      docter.findOne({
-          where: { reset_password: otp }
-      }).then(user => {
-          if (!user) {
-              return res.status(422).json({
-                  message: "user reset Otp not existe"
-  
-              })
-          }
-          bcrypt.genSalt(10, (err, salt) => {
-              bcrypt.hash(newPassword, 10, async (err, hash) => {
-                  // user.reset_password = null
-                  user.password = hash
-                  user.save().then((saveduser) => {
-                      res.json({
-                          message: "Password Updated success"
-                      })
-                  })
-              })
-          })
-      }).catch(err => {
-          console.log(err);
-      })
-  } else {
-      patient.findOne({
-          where: { reset_password: otp }
-      }).then(user => {
-          if (!user) {
-              return res.status(422).json({
-                  message: "user reset Otp not existe 1"
-  
-              })
-          }
-          bcrypt.genSalt(10, (err, salt) => {
-              bcrypt.hash(newPassword, 10, async (err, hash) => {
-                  user.reset_password = null
-                  user.password = hash
-                  user.save().then((saveduser) => {
-                      res.json({
-                          message: "Password Updated success"
-                      })
-                  })
-              })
-          })
-      }).catch(err => {
-          console.log(err);
-      })
-  }
-  
-}
 
 
 exports.signout = (req, res) => {

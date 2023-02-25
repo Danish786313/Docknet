@@ -11,8 +11,8 @@ const { sequelize } = require('./models');
 app.use(expressLayouts)
 app.set('layout', './layouts/default')
 app.set('view engine', 'ejs')
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json())
 app.use(cookieParser());
 // app.use(cors())
 
@@ -37,7 +37,6 @@ const slots = require("./routes/slotsrout")
 const prescription = require("./routes/Prescriptionrout")
 const review = require("./routes/reviewrout")
 
-app.use(bodyParser.json())
 app.use(cookieParser());
 app.use(cors())
 

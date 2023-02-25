@@ -20,12 +20,6 @@ exports.getbankdetails = async (req, res, next, id) => {
 }
 
 exports.create = async (req, res) => {
-    let bank = await bankdetail.findOne({where: { docter_id: req.profile.id}})
-    if (bank) {
-        return res.status(201).json({
-            message: "bank details already exists"
-        })
-    }
     req.body.docter_id = req.profile.id
     await bankdetail.create(req.body).then(bankdetail => {
         res.status(200).json({

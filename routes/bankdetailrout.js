@@ -1,11 +1,13 @@
 const express = require('express')
 const router = express.Router()
 const bankdetaicontroller = require("../controllers/bankdetailscontroller")
+const { bankDetails } = require("../validations/bankdetails")
+const { validate } = require("../validations/validate")
 const checkAuth = require("../middleware/check-auth")
 
 router.param("bankId", bankdetaicontroller.getbankdetails)
 
-router.post("/bank", checkAuth.getLogedInUser, bankdetaicontroller.create)
+router.post("/bank", checkAuth.getLogedInUser, bankDetails(), validate, bankdetaicontroller.create)
 
 router.get("/bank", checkAuth.getLogedInUser, bankdetaicontroller.findOne)
 

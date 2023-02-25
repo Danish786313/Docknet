@@ -1,12 +1,11 @@
 const { body } = require('express-validator');
-const { docter } = require("../models");
-const { Op } = require("sequelize");
+const { docter, patient } = require("../models");
 
 exports.docterRegisterValidation = (req, res) => {
   return [
     body('fullName', 'Name is Required').notEmpty().trim(),
     body('gender', 'Gender should be Male female or other').notEmpty().isIn(["Male", "Female", "Other"]).trim(),
-    body('email','Email is Required').notEmpty().trim(),
+    body('email','Email is Required').notEmpty().isEmail().trim(),
     body('phone','Phone number is Required').notEmpty().isLength({ min: 10, max: 10 }).trim().trim(),
     body('password', 'Strong password required').notEmpty().trim().isStrongPassword(),
     body('degree','Degree is Required').notEmpty().trim(),
@@ -26,7 +25,7 @@ exports.docterRegisterValidation = (req, res) => {
         })
     }),
     body("Docter").custom(async (value, {req}) => {
-        if (req.body.isPharmacist != false) {
+        if (req.body.isPharmacist == true) {
             if (!req.body.clinicName) {
                 return Promise.reject("Clinic name is required")
             }
@@ -77,32 +76,59 @@ exports.docterRegisterValidation = (req, res) => {
   ]
 }
 
+exports.docterlogin = (req, res) => {
+    return [
+        body('email','Email is Required').notEmpty().trim(),
+        body('password', 'password is required').notEmpty().trim(),
+    ]
+}
 
+exports.ForgotPassword = (req, res) => {
+    return [
+        body('email','Email is Required').notEmpty().trim(),
+    ]
+}
 
+exports.newPassword = (req, res) => {
+    return [
+        body('newPassword','New Password is Required It should be strong').notEmpty().isStrongPassword().trim(),
+        body('otp','Otp is Required').notEmpty().trim(),
+    ]
+}
 
+exports.patientRegister = (req, res) => {
+    return [
+        body('name', 'Name is Required').notEmpty().trim(),
+        body('phone', 'Phone should be Male female or other').isLength({ min: 10, max: 10 }).trim(),
+        body('DOB','Date of birth is Required').notEmpty().isDate().trim(),
+        body('gender','Gender is Required').notEmpty().isIn(["Male", "Female", "Other"]).trim(),
+        body('email', 'Email is password required').notEmpty().isEmail().trim(),
+        body('password','Password is Required').notEmpty().isStrongPassword().trim(),
+        body('phone').custom(async value => {
+            return await patient.findOne({ where: { phone: value }, raw: true }).then(patient => {
+              if (patient) {
+                return Promise.reject('This number Already exists. Please choose another')
+              }
+            })
+        }),
+        body('email').custom(async value => {
+            return await patient.findOne({ where: { email: value }, raw: true }).then(patient => {
+              if (patient) {
+                return Promise.reject('This email Already exists. Please choose another')
+              }
+            })
+        }),
+        body("Docter").custom(async (value, {req}) => {
+            if (!req.file) {
+                return Promise.reject('Profile picture is required')
+            }
+        })
+    ]
+}
 
-
-
-
-
-// exports.updateProjectValidation = () => {
-//   return [
-//     body('name').custom(async (value, { req }) => {
-//       return await Project.findOne({
-//         where: {
-//           id: {
-//             [Op.ne]: req.params.projectId
-//           },
-//           name: value,
-//         }, raw: true
-//       })
-//         .then(projects => {
-//           if (projects) {
-//             return Promise.reject('Project Name Already Taken')
-//           }
-//         })
-//     }),
-//   ]
-// }
-
-
+exports.patientLogin = (req, res) => {
+    return [
+        body('email', 'email is Required').notEmpty().trim(),
+        body('password', 'Password id required').notEmpty().trim(),
+    ]
+}

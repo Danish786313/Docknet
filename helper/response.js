@@ -26,7 +26,6 @@ module.exports = {
     },
 
     successResponseWithoutData(res, message, code = 1) {
-        // console.log(res, message, code);
         const response = {
             status: true,
             message: message,
@@ -34,12 +33,13 @@ module.exports = {
         return res.status(code).send(response)
     },
 
-    // errorResponseWithoutData(res, message, code = 400) {
-    //     const response = {
-    //         message: message,
-    //     }
-    //     return res.status(code).send(response)
-    // },
+    errorResponseWithoutData(res, message, code = 400) {
+        const response = {
+            status: false,
+            message: message,
+        }
+        return res.status(code).send(response)
+    },
 
     errorResponseData(res, message, req, code = 400) {
         console.log("\x1b[33m%s\x1b[0m", `ERROR [path = ${req.url}], [MESSAGE = ${message}], [CODE = ${code}]`);
