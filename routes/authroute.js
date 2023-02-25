@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const authcontroller = require("../controllers/authcontroller")
 const multer = require("../middleware/upload-docs")
+const { docterRegisterValidation } = require("../validations/authvalidation");
+const { validate } = require("../validations/validate")
+const parser = require("../helper/helper")
 
 
 router.post("/register", multer.upload.fields([ {name: "logo", maxCount:1}, {name: "profilePicture", maxCount:1 },  {name: "licenseFront", maxCount:1}, {name: "licenseBack", maxCount:1}, {name: "identityCardFront", maxCount:1}, {name: "identityCardBack", maxCount:1}, {name: "clinicLicenseFront", maxCount:1}, {name: "clinicLicenseBack", maxCount:1}]), authcontroller.docterregister);

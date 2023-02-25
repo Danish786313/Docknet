@@ -52,6 +52,7 @@ module.exports = {
 
     validationErrorResponseData(res, message, code = 400) {
         const response = {
+            status: false,
             message: message
         }
         return res.status(code).send(response)

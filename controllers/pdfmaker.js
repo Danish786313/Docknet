@@ -1,6 +1,6 @@
 const { SUCCESS, FAIL } = require("../helper/constants");
 const Response = require("../helper/response");
-const { prescription_setting } = require("../models")
+const { prescription_setting, docter } = require("../models")
 const PDFDocument = require('pdfkit');
 const moment = require("moment")
 const path = require("path")
@@ -137,7 +137,6 @@ async function buildPDF2(req, res, dataCallback, endCallback) {
         doc.on('end', endCallback);
         let fileObj = req.files
         let Psetting = await prescription_setting.findOne({where: {docter_id: req.profile.id }})
-
         //Line
         let line = JSON.parse(Psetting.line)
         doc
