@@ -168,16 +168,17 @@ exports.docterLogin = async (req, res) => {
                         email: user.email,
                         phone: user.phone
                     }, process.env.secret , {expiresIn: "365d"}, async (err, token) => {
-                        let data = {}
-                        data = user
-                        data.token = token
+                        // let data = {}
+                        // data = user
+                        // data.token = token
+                        user.Token = token;
                         await user.save().then((user) => {
-                          return Response.successResponseData(
-                              res,
-                              data,
-                              SUCCESS,
-                              "Login successfully!"
-                          )
+                            return res.status(200).json({
+                                success: true,
+                                message: "Login Successful",
+                                token: token,
+                                User: user
+                            })
                         })
                     });
                 } else {
