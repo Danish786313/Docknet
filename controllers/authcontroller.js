@@ -32,11 +32,11 @@ exports.docterregister = async (req, res) => {
                         docs.docter_id =  result.id
                         reqObj.logo? docs.logo = req.files.logo[0].filename : null
                         reqObj.licenseFront? docs.licenseFront = req.files.licenseFront[0].filename : null;
-                        reqObj.licenseBack? docs.licenseBack = req.files.licenseBack[0].filename : null;
+                        // reqObj.licenseBack? docs.licenseBack = req.files.licenseBack[0].filename : null;
                         reqObj.identityCardFront? docs.identityCardFront = req.files.identityCardFront[0].filename : null;
                         reqObj.identityCardBack? docs.identityCardBack = req.files.identityCardBack[0].filename : null;
                         reqObj.clinicLicenseFront? docs.clinicLicenseFront = req.files.clinicLicenseFront[0].filename : null;
-                        reqObj.clinicLicenseBack? docs.clinicLicenceBack = req.files.clinicLicenseBack[0].filename : null;
+                        // reqObj.clinicLicenseBack? docs.clinicLicenceBack = req.files.clinicLicenseBack[0].filename : null;
                         await docterInfo.create(docs, { transaction: t })
                             ejs.renderFile(path.join(__dirname, "../views/approvalmail.ejs"), {
                                 name: req.body.fullName,

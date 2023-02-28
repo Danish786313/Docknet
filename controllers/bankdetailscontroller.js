@@ -1,5 +1,6 @@
 const { bankdetail, docter } = require('../models')
-
+const { SUCCESS, FAIL } = require("../helper/constants")
+const Response = require("../helper/response")
 
 exports.getbankdetails = async (req, res, next, id) => {
     await bankdetail.findByPk(id, {
@@ -12,82 +13,105 @@ exports.getbankdetails = async (req, res, next, id) => {
             throw Error
         }
     }).catch(err => {
-        return res.status(400).json({
-            success: false,
-            message: "bank Details does not exists."
-        })
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "bank Details does not exists.",
+            req,
+        )
     })
 }
 
 exports.create = async (req, res) => {
     req.body.docter_id = req.profile.id
     await bankdetail.create(req.body).then(bankdetail => {
-        res.status(200).json({
-            success: true,
-            message: 'bankdetail added successfully',
-            result: bankdetail
-        })
+        return Response.successResponseWithoutData(
+            res,
+            SUCCESS,
+            "bankdetail added successfully.",
+            req
+        )
     }).catch(error => {
-        res.status(400).json({
-            success: false,
-            message: 'Something went wrong while adding the bankdetail',
-            Error: error 
-        })
+        console.log(error)
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "omething went wrong while adding the bankdetail.",
+            req,
+        )
     })
 }
 
 exports.findOne = async (req, res) => {
     await bankdetail.findOne({where: {docter_id: req.profile.id}}).then(data => {
         if (data) {
-            return res.status(200).json({
-                message: "bankdetail fetched successfully",
-                result: data
-            })
+            return Response.successResponseData(
+                res,
+                data,
+                SUCCESS,
+                "bankdetail found successfullysdd",
+            )
         } else {
-            return res.status(400).json({
-                message: "Bank details does not exist",
-            })
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Bank details does not exist",
+                req,
+            )
         }      
     }).catch(err => {
-        return res.status(400).json({
-            message: "Error while feching bankdetails",
-            result: err.message
-        })
+        console.log(err)
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong while finding the bank details.",
+            req,
+        )
     })
 }
 
 exports.update = async (req, res) => {
     await bankdetail.update(req.body, {where: {id: req.params.bankId}}).then(bankdetail => {
-        // throw Error
         if (bankdetail[0] != 0) {
-            res.status(200).json({
-                success: true,
-                message: "bankdetail updated successfully",
-                result: bankdetail
-            })
+            return Response.successResponseWithoutData(
+                res,
+                SUCCESS,
+                "bankdetail updated successfully.",
+                req
+            )
         } else {
-            return Promise.reject("Please provide atlest one field to update")
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Please provide atlest one field to update.",
+                req,
+            )
         }
     }).catch(error => {
-        return res.status(400).json({
-            success: false,
-            Error: error
-        })
+        console.log(error)
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong while updating the bank details.",
+            req,
+        )
     })
 }
 
 exports.delete = async (req, res) => {
     await bankdetail.destroy({where: {id: req.params.bankId}}).then(bankdetail => {
-        res.status(200).json({
-            success: true,
-            message: "bankdetail deleted successfully",
-            result: bankdetail
-        })
+        return Response.successResponseWithoutData(
+            res,
+            SUCCESS,
+            "bankdetail deleted successfully.",
+            req
+        )
     }).catch(error => {
-        res.status(400).json({
-            success: false,
-            message: "Something went wrong while deleting bankdetail",
-            Error: error
-        })
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong while deleting bankdetails.",
+            req,
+        )
     })
 }

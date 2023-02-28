@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { body, header } = require('express-validator');
 const { availability } = require("../models");
 
 exports.availabity = (req, res) => {
@@ -13,5 +13,11 @@ exports.availabity = (req, res) => {
                 }
             })
         })
+    ]
+}
+
+exports.getAvailabity = (req, res) => {
+    return [
+        header()
     ]
 }

@@ -9,7 +9,7 @@ module.exports = {
      * @returns {{data: , meta: {message:, code: *}}}
      */
 
-    successResponseData(res, data, code = 1, message, extras, req) {
+    successResponseData(res, data, code = 1, message, extras) {
         const response = {
             status: true,
             message: message,

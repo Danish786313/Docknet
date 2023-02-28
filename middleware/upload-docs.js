@@ -12,7 +12,7 @@ var storage = multer.diskStorage({
 })
 
 var fileFilter = (req, file, cb) => {
-    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'video/mp4'){
+    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'video/mp4' || file.mimetype === 'jpg'){
         cb(null, true)
     }else{
         cb(new Error('Unsupported File'), false)

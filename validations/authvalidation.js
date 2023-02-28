@@ -10,19 +10,23 @@ exports.docterRegisterValidation = (req, res) => {
     body('password', 'Strong password required').notEmpty().trim().isStrongPassword(),
     body('degree','Degree is Required').notEmpty().trim(),
     body('isPharmacist','Please answer the question are you Pharmacist ?').notEmpty().trim(),
-    body('phone').custom(async value => {
-        return await docter.findOne({ where: { phone: value }, raw: true }).then(docter => {
-          if (docter) {
-            return Promise.reject('This number Already exists. Please choose another')
-          }
-        })
+    body('phone').custom(async (value, {req}) => {
+        if (req.method == "POST") {
+            return await docter.findOne({ where: { phone: value }, raw: true }).then(docter => {
+              if (docter) {
+                return Promise.reject('This number Already exists. Please choose another')
+              }
+            })
+        }
     }),
-    body('email').custom(async value => {
-        return await docter.findOne({ where: { email: value }, raw: true }).then(docter => {
-          if (docter) {
-            return Promise.reject('This email Already exists. Please choose another')
-          }
-        })
+    body('email').custom(async (value, {req}) => {
+        if (req.method == "POST") {
+            return await docter.findOne({ where: { email: value }, raw: true }).then(docter => {
+              if (docter) {
+                return Promise.reject('This email Already exists. Please choose another')
+              }
+            })
+        }
     }),
     body("Docter").custom(async (value, {req}) => {
         if (req.body.isPharmacist == "false") {
@@ -59,9 +63,9 @@ exports.docterRegisterValidation = (req, res) => {
             if (!req.files.licenseFront) {
                 return Promise.reject("Licence Front is required")
             }
-            if (!req.files.licenseBack) {
-                return Promise.reject("Licence Back is required")
-            }
+            // if (!req.files.licenseBack) {
+            //     return Promise.reject("Licence Back is required")
+            // }
             if (!req.files.identityCardFront) {
                 return Promise.reject("Identity card Front is required")
             }
@@ -71,8 +75,10 @@ exports.docterRegisterValidation = (req, res) => {
             if (!req.files.clinicLicenseFront) {
                 return Promise.reject("Clinic licence Front is required")
             }
-            if (!req.files.clinicLicenseBack) {
-                return Promise.reject("Clinic licence Back is required")
+            if (req.method === "PATCH") {
+                if (!req.files.introVideo) {
+                    return Promise.reject("Intro Video is required required")
+                }
             }
         }
     }),

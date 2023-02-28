@@ -50,7 +50,12 @@ exports.updateAvailability = async (req, res) => {
                 req
             )
         } else {
-            return Promise.reject("Please Provide atleast one field to update")
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Please Provide atleast one field to update",
+                req
+            )
         }
     }).catch(err => {
         return Response.errorResponseWithoutData(

@@ -1,4 +1,6 @@
 const { docter, sequelize, patient, docterInfo, admin, bankdetail } = require("../models")
+const { SUCCESS, FAIL } = require("../helper/constants")
+const Response = require("../helper/response")
 
 exports.getdocter = async (req, res, next, id) => {
     try {
@@ -12,102 +14,143 @@ exports.getdocter = async (req, res, next, id) => {
         }
     }
     catch (error) {
-        return res.status(400).json({
-            success: false,
-            message: "Docter does not exists."
-        })
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Docter does not exists.",
+            req
+        )
     }
 }
 
 
 exports.findById = async (req, res) => {
-    await docter.findOne({
-        where:{id : req.profile.id}, 
-        include: [{model: docterInfo}, {model: bankdetail}]}).then(docter => {
-        if (docter) {
-            res.status(200).json({
-                message: "Docter fetched successfully",
-                results: docter
-            })
+    await docter.findOne({ where:{id : req.profile.id}, include: [{model: docterInfo}, {model: bankdetail}]}).then(data => {
+        if (data) {
+            return Response.successResponseData(
+                res,
+                data,
+                SUCCESS,
+                "Docter fetched successfully."
+            )
         } else {
-            throw Error
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Error while fetching docter.",
+                req
+            )
         }
        
     }).catch(error =>{
-        res.status(400).json({
-            message: "Docter fetched successfully",
-            results: docter
-        })
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Sometn=hing went wrong while fetching docter.",
+            req
+        )
     })
 }
 
 exports.docterUpdate = async (req, res) => {
-    await sequelize.transaction(async (t) => {
+    let t = await sequelize.transaction()
+    try {
         reqObj = req.files
         reqObj.profilePicture?  req.body.photo = req.files.profilePicture[0].filename : null;
         await docter.update(req.body, {where: {id: req.profile.id}}, {transaction: t}).then(async docter => {
-            console.log(docter)
             if (docter.length) {
                 docs = {}
                 reqObj.logo? docs.logo = req.files.logo[0].filename : null
                 reqObj.licenseFront? docs.licenseFront = req.files.licenseFront[0].filename : null;
-                reqObj.licenseBack? docs.licenseBack = req.files.licenseBack[0].filename : null;
+                // reqObj.licenseBack? docs.licenseBack = req.files.licenseBack[0].filename : null;
                 reqObj.identityCardFront? docs.identityCardFront = req.files.identityCardFront[0].filename : null;
                 reqObj.identityCardBack? docs.identityCardBack = req.files.identityCardBack[0].filename : null;
                 reqObj.clinicLicenseFront? docs.clinicLicenseFront = req.files.clinicLicenseFront[0].filename : null;
-                reqObj.clinicLicenseBack? docs.clinicLicenceBack = req.files.clinicLicenseBack[0].filename : null;
+                // reqObj.clinicLicenseBack? docs.clinicLicenceBack = req.files.clinicLicenseBack[0].filename : null;
                 reqObj.introVideo? docs.introVideo = req.files.introVideo[0].filename : null;
                 await docterInfo.update(docs, {where: {docter_id: req.profile.id}}, {transaction: t}).then(docterInfo => {
                     if (docterInfo.length) {
-                        res.status(200).json({
-                            message: "docter updated successfully",
-                            result: docter,
-                            docterInfo: docterInfo 
-                        })
+                        return Response.successResponseWithoutData(
+                            res,
+                            SUCCESS,
+                            "Docter profile updated successfully"
+                        )
                     } else {
-                        return res.status(400).json({
-                            message: "Something went wrong. 123",
-                            error: err
-                        })
+                        t.rollback();
+                        return Response.errorResponseWithoutData(
+                            res,
+                            FAIL,
+                            "Something went wrong. while updating profile",
+                            req
+                        )
                     }
                 }).catch(err => {
-                    res.status(400).json({
-                        message: "Something went wrong.",
-                        error: err
-                    })
+                    t.rollback();
+                    return Response.errorResponseWithoutData(
+                        res,
+                        FAIL,
+                        "Something went wrong. while updating docter info.",
+                        req
+                    )
                 });
             } else {
-                return res.status(400).json({
-                    message: "Something went wrong.",
-                    error: err
-                })
+                t.rollback();
+                return Response.errorResponseWithoutData(
+                    res,
+                    FAIL,
+                    "Something went wrong. while updating docter profile.",
+                    req
+                )
             }
-            
         }).catch(err => {
-            res.status(400).json({
-                message: "Something went wrong.",
-                error: err
-            });
-        })        
-    })
+            t.rollback();
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Something went wrong. while updating docter profile.",
+                req,
+            )
+        })
+    } catch (error) {
+        console.log(error)
+        t.rollback();
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong. while updating docter profile.",
+            req,
+        )
+    }
 };
 
 
 exports.deleteDocter = async (req, res) => {
-    await docter.destroy({where: {id: req.profile.id}}).then((docter) => {
-        return res.status(200).json({
-               message: "Docter deleted successfully",
-               result: docter
-        })
-    }).catch(err => {
-        return res.status(400).json({
-               message: "Something went wrong",
-               error: err
-        });
-    });
-}
-
-;
+    try {
+        let docter = await docter.destroy({where: {id: req.profile.id}})
+        if (docter.length != "0") {
+            return Response.successResponseWithoutData(
+                res,
+                SUCCESS,
+                "Docter profile deleted successfully"
+            )
+        } else {
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Something went wrong. while deleting docter profile.",
+                req,
+            )
+        }
+    } catch (error) {
+        console.log(error)
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong. while deleting docter profile.",
+            req,
+        )
+    }   
+};
 
 const getPagination = (_page, _limit) => {
     const limit = _limit ? +_limit : 20;

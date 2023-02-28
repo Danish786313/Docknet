@@ -6,7 +6,7 @@ const { docterRegisterValidation, docterlogin, ForgotPassword, newPassword, pati
 const { validate } = require("../validations/validate")
 const checkAuth = require("../middleware/check-auth")
 
-router.post("/register", multer.upload.fields([ {name: "logo", maxCount:1}, {name: "profilePicture", maxCount:1 },  {name: "licenseFront", maxCount:1}, {name: "licenseBack", maxCount:1}, {name: "identityCardFront", maxCount:1}, {name: "identityCardBack", maxCount:1}, {name: "clinicLicenseFront", maxCount:1}, {name: "clinicLicenseBack", maxCount:1}]), docterRegisterValidation(), validate, authcontroller.docterregister);
+router.post("/register", multer.upload.fields([ {name: "logo", maxCount:1}, {name: "profilePicture", maxCount:1 },  {name: "licenseFront", maxCount:1}, /* {name: "licenseBack", maxCount:1}, */ {name: "identityCardFront", maxCount:1}, {name: "identityCardBack", maxCount:1}, {name: "clinicLicenseFront", maxCount:1}, /* {name: "clinicLicenseBack", maxCount:1} */]), docterRegisterValidation(), validate, authcontroller.docterregister);
 
 router.get("/approve", authcontroller.aproveDocter);
 
