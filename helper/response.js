@@ -9,7 +9,7 @@ module.exports = {
      * @returns {{data: , meta: {message:, code: *}}}
      */
 
-    successResponseData(res, data, code = 1, message, extras) {
+    successResponseData(res, data, code = 1, message, extras, req) {
         const response = {
             status: true,
             message: message,
@@ -25,7 +25,7 @@ module.exports = {
         return res.send(response)
     },
 
-    successResponseWithoutData(res, message, code = 1) {
+    successResponseWithoutData(res, code = 1, message, req) {
         const response = {
             status: true,
             message: message,
@@ -33,7 +33,8 @@ module.exports = {
         return res.status(code).send(response)
     },
 
-    errorResponseWithoutData(res, message, code = 400) {
+    errorResponseWithoutData(res, code = 1, message, req) {
+        console.log("\x1b[33m%s\x1b[0m", `ERROR [path = ${req.url}], [MESSAGE = ${message}], [CODE = ${code}]`);
         const response = {
             status: false,
             message: message,
@@ -41,7 +42,7 @@ module.exports = {
         return res.status(code).send(response)
     },
 
-    errorResponseData(res, message, req, code = 400) {
+    errorResponseData(res, message, req, code = 1) {
         console.log("\x1b[33m%s\x1b[0m", `ERROR [path = ${req.url}], [MESSAGE = ${message}], [CODE = ${code}]`);
         const response = {
             status: false,
@@ -50,7 +51,7 @@ module.exports = {
         return res.status(code).send(response)
     },
 
-    validationErrorResponseData(res, message, code = 400) {
+    validationErrorResponseData(res, message, code = 1) {
         const response = {
             status: false,
             message: message

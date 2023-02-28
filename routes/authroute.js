@@ -2,13 +2,11 @@ const express = require('express');
 const router = express.Router();
 const authcontroller = require("../controllers/authcontroller")
 const multer = require("../middleware/upload-docs")
-const { docterRegisterValidation, docterlogin, ForgotPassword, newPassword, patientRegister, patientLogin } = require("../validations/authvalidation");
+const { docterRegisterValidation, docterlogin, ForgotPassword, newPassword, patientRegister, patientLogin, verifyOtp } = require("../validations/authvalidation");
 const { validate } = require("../validations/validate")
 const checkAuth = require("../middleware/check-auth")
-const parser = require("../helper/helper")
 
-
-router.post("/register", parser.json, multer.upload.fields([ {name: "logo", maxCount:1}, {name: "profilePicture", maxCount:1 },  {name: "licenseFront", maxCount:1}, {name: "licenseBack", maxCount:1}, {name: "identityCardFront", maxCount:1}, {name: "identityCardBack", maxCount:1}, {name: "clinicLicenseFront", maxCount:1}, {name: "clinicLicenseBack", maxCount:1}]), docterRegisterValidation(), validate, parser.json, authcontroller.docterregister);
+router.post("/register", multer.upload.fields([ {name: "logo", maxCount:1}, {name: "profilePicture", maxCount:1 },  {name: "licenseFront", maxCount:1}, {name: "licenseBack", maxCount:1}, {name: "identityCardFront", maxCount:1}, {name: "identityCardBack", maxCount:1}, {name: "clinicLicenseFront", maxCount:1}, {name: "clinicLicenseBack", maxCount:1}]), docterRegisterValidation(), validate, authcontroller.docterregister);
 
 router.get("/approve", authcontroller.aproveDocter);
 
@@ -18,7 +16,7 @@ router.post("/register/patient", multer.upload.single("profilePicture"), patient
 
 router.post("/patient/login", patientLogin(), validate, authcontroller.patientLogin);
 
-router.patch('/verifyOtp', authcontroller.verifyOtp);
+router.patch('/verifyOtp', verifyOtp(), validate, authcontroller.verifyOtp);
 
 router.post("/forgotPasswordDocter", ForgotPassword(), validate,  checkAuth.getLogedInUser, authcontroller.changePasswordDocter)
 

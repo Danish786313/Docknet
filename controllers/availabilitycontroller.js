@@ -1,67 +1,82 @@
 const { availability, slottime } = require("../models")
+const { SUCCESS, FAIL } = require("../helper/constants")
+const Response = require("../helper/response")
 
 exports.CreateAvailability = async (req, res) => {
-    let available = await availability.findOne({where: { id: req.profile.id }})
-    if (available) {
-        return res.status(400).send({
-            message: "You have already created availability"
-        })
-    }
     req.body.docter_id = req.profile.id
-    await availability.create(req.body).then(async (availability) => {
-        res.status(200).json({
-            message: "Availability created successfully",
-            Availability: availability,
-        })
+    await availability.create(req.body).then(async (data) => {
+        return Response.successResponseData(
+            res,
+            data,
+            SUCCESS,
+            "Availability created successfully"
+        )
     }).catch((err) => {
-        res.status(500).json({
-            success: false,
-            message: err.message
-        })
+        console.log(err)
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong while creating the availability",
+            req,
+        )
     });
 }
 
 exports.getAvailability = async (req, res) => {
     await availability.findOne({ where: {docter_id: req.profile.id}}).then((data) => {
-        res.status(200).json({
-            message: "Availability fetched successfully",
-            result: data
-        })
+        return Response.successResponseData(
+            res,
+            data,
+            SUCCESS,
+            "Availability fetched successfully"
+        )
     }).catch((err) => {
-        res.status(500).json({
-            success: false,
-            message: err.message
-        })
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong while fetching the availability",
+            req
+        )
     })
 }
 
 exports.updateAvailability = async (req, res) => {
     await availability.update(req.body, {where: {docter_id: req.profile.id}}).then(data => {
         if (data[0] != 0) {
-            res.status(200).json({
-                message: "Slot updated successfully",
-                result: data
-            })
+            return Response.successResponseWithoutData(
+                res,
+                SUCCESS,
+                "Availability updated successfully",
+                req
+            )
         } else {
             return Promise.reject("Please Provide atleast one field to update")
         }
     }).catch(err => {
-        res.status(200).json({
-            success: false,
-            Error: err
-        })
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong while updating the availability",
+            req
+        )
     })
 }
 
 exports.deleteAvailability = async (req, res) => {
     await availability.destroy({where: {docter_id: req.profile.id}}).then(() => {
-        res.status(200).json({
-            message: "Availability deleted successfully"
-        })
+        return Response.successResponseWithoutData(
+            res,
+            SUCCESS,
+            "Availability deleted successfully",
+            req
+        )
     }).catch((err) => {
-        res.status(500).json({
-            success: false,
-            message: err.message
-        })
+        console.log(err)
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong while deleting the availability",
+            req
+        )
     });
 };

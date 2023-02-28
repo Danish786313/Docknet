@@ -2,8 +2,10 @@ const express = require("express")
 const router = express.Router()
 const apointmentController = require("../controllers/apointmentcontroller")
 const checkOuth = require("../middleware/check-auth")
+const { apointCreate }  = require("../validations/apointmentvalidation")
+const { validate } = require("../validations/validate")
 
-router.post("/apointment", checkOuth.getLogedInPatient, apointmentController.createApointment)
+router.post("/apointment", /* apointCreate(), validate, */ checkOuth.getLogedInPatient, apointmentController.createApointment)
 
 router.get("/apointment", checkOuth.getLogedInUser, apointmentController.apointments)
 

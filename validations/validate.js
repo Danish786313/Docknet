@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator')
 const Response = require("../helper/response")
+const { FAIL } = require("../helper/constants")
 
 exports.validate = (req, res, next) => {
     const errors = validationResult(req)
@@ -11,7 +12,8 @@ exports.validate = (req, res, next) => {
     errors.array().map(err => extractedErrors[err.param]= err.msg )
     return Response.validationErrorResponseData(
         res,
-        extractedErrors
+        extractedErrors,
+        FAIL,
     )
     
     // return res.status(422).json({

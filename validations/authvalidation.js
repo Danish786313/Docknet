@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { body, param, check } = require('express-validator');
 const { docter, patient } = require("../models");
 
 exports.docterRegisterValidation = (req, res) => {
@@ -25,7 +25,7 @@ exports.docterRegisterValidation = (req, res) => {
         })
     }),
     body("Docter").custom(async (value, {req}) => {
-        if (req.body.isPharmacist == true) {
+        if (req.body.isPharmacist == "false") {
             if (!req.body.clinicName) {
                 return Promise.reject("Clinic name is required")
             }
@@ -46,6 +46,9 @@ exports.docterRegisterValidation = (req, res) => {
             }
             if (!req.body.consultCharge) {
                 return Promise.reject("Consult charge is required")
+            }
+            if (!Object.keys(req.files).length) {
+                return Promise.reject("Documents are required")
             }
             if (!req.files.logo) {
                 return Promise.reject("Logo is required")
@@ -128,7 +131,20 @@ exports.patientRegister = (req, res) => {
 
 exports.patientLogin = (req, res) => {
     return [
-        body('email', 'email is Required').notEmpty().trim(),
-        body('password', 'Password id required').notEmpty().trim(),
+        check('email', 'email is Required').notEmpty().trim(),
+        check('password', 'Password id required').notEmpty().trim(),
+    ]
+}
+
+exports.verifyOtp = (req, res) => {
+    return [
+        body('Params').custom(async (value, { req }) => {
+            if (!req.query.otp) {
+                return Promise.reject('Otp is required')
+            }
+            if (!req.query.email) {
+                return Promise.reject('Email is required')
+            }
+        }),
     ]
 }

@@ -20,76 +20,79 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.docterregister = async (req, res) => {
-  await docter.findOne({where: {email: req.body.email }})
-  .then(result => {
-      if(!result){
-          bcrypt.genSalt(10, (err, salt) => {
-              bcrypt.hash(req.body.password, 10, async (err, hash) => {
-                  req.body.password = hash
-                  req.files? req.body.photo = req.files.profilePicture[0].filename : null
-                  const t = await sequelize.transaction();
-                      await docter.create(req.body, { transaction: t }).then(async result => {
-                          let docs = {
-                              docter_id: result.id,
-                              logo: req.files.logo[0].filename,
-                              licenseFront: req.files.licenseFront[0].filename,
-                              licenseBack: req.files.licenseBack[0].filename,
-                              identityCardFront: req.files.identityCardFront[0].filename,
-                              identityCardBack: req.files.identityCardBack[0].filename,
-                              clinicLicenseFront: req.files.clinicLicenseFront[0].filename,
-                              clinicLicenceBack: req.files.clinicLicenseBack[0].filename
-                          }
-                          await docterInfo.create(docs, { transaction: t })
-                          try {
-                              ejs.renderFile(path.join(__dirname, "../views/approvalmail.ejs"), {
-                                  name: req.body.fullName,
-                              }).then(async template => {
-                                  transporter.sendMail({
-                                      to: process.env.Admin_id,
-                                      from: "Docknet",
-                                      subject: "Request to approve profile",
-                                      html: template
-                                  }).then(async email => {
-                                      await t.commit();
-                                      return res.status(200).json({
-                                          message: "Email sent",
-                                          Email: email
-                                      })
-                                  }).catch(async (err) => {
-                                      await t.rollback();
-                                      return res.status(400).json({
-                                          message: "Something went wrong",
-                                          error: err
-                                      })
-                                  });
-                              }).catch(async (err) =>  {
-                                  await t.rollback();
-                                   return res.status(400).json({
-                                      message: "Something went wrong",
-                                      error: err
-                                   })
-                              })
-                          } catch (err) {
-                              await t.rollback();
-                              return res.status(400).json({
-                                  message: "Something went wrong",
-                                  error: err
-                              })
-                          };
-                      })
-              })
-          }) 
-      } else {
-          return res.status(400).json({
-              message: "Email already exist",
-          })
-      }
-  }).catch(err => {
-      return res.status(400).json({
-          message : "Something went wrong",
-          error: err
-      })
-  })
+    const t = await sequelize.transaction();
+    try {
+        let reqObj = req.files
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(req.body.password, 10, async (err, hash) => {
+                req.body.password = hash
+                reqObj.profilePicture?  req.body.photo = req.files.profilePicture[0].filename : null;
+                    await docter.create(req.body, { transaction: t }).then(async result => {
+                        docs = {}
+                        docs.docter_id =  result.id
+                        reqObj.logo? docs.logo = req.files.logo[0].filename : null
+                        reqObj.licenseFront? docs.licenseFront = req.files.licenseFront[0].filename : null;
+                        reqObj.licenseBack? docs.licenseBack = req.files.licenseBack[0].filename : null;
+                        reqObj.identityCardFront? docs.identityCardFront = req.files.identityCardFront[0].filename : null;
+                        reqObj.identityCardBack? docs.identityCardBack = req.files.identityCardBack[0].filename : null;
+                        reqObj.clinicLicenseFront? docs.clinicLicenseFront = req.files.clinicLicenseFront[0].filename : null;
+                        reqObj.clinicLicenseBack? docs.clinicLicenceBack = req.files.clinicLicenseBack[0].filename : null;
+                        await docterInfo.create(docs, { transaction: t })
+                            ejs.renderFile(path.join(__dirname, "../views/approvalmail.ejs"), {
+                                name: req.body.fullName,
+                            }).then(async template => {
+                                transporter.sendMail({
+                                    to: process.env.Admin_id,
+                                    from: "Docknet",
+                                    subject: "Request to approve profile",
+                                    html: template
+                                }).then(async email => {
+                                    await t.commit();
+                                    return Response.successResponseWithoutData(
+                                        res,
+                                        SUCCESS,
+                                        "SuccessFully Registerd and Email Have send to admin for profile approval",
+                                        req
+                                    )
+                                }).catch(async (err) => {
+                                    await t.rollback();
+                                    return Response.errorResponseWithoutData(
+                                        res,
+                                        FAIL,
+                                        "ErrorFully Registerd and Email Have not send to admin Please try again later",
+                                        req,
+                                    )
+                                });
+                            }).catch(async (err) =>  {
+                                await t.rollback();
+                                return Response.errorResponseWithoutData(
+                                    res,
+                                    FAIL,
+                                    "Something went wrong",
+                                    req,
+                                )
+                            })
+                    }).catch(async (err) => {
+                        await t.rollback();
+                        return Response.errorResponseWithoutData(
+                            res,
+                            FAIL,
+                            "Something went wrong",
+                            req,
+                        )
+                    })
+            })
+        }) 
+    } catch (err) {
+        console.log(err)
+        await t.rollback();
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong",
+            req,
+        )
+    };
 }
 
 exports.aproveDocter = async (req, res) => {
@@ -148,119 +151,122 @@ exports.aproveDocter = async (req, res) => {
 
 
 exports.docterLogin = async (req, res) => {
-  await docter.findOne({where: {email: req.body.email }}).then(async user => {
-      if (user) {
-          if (user.is_aprove == false) {
-              return res.status(400).json({
-                  success: false,
-                  message: "Your account is not approved yet."
-              })
-          }
-          bcrypt.compare(req.body.password, user.password, (err, result) => {
-              if (result) {
-                  jwt.sign({
-                      id: user.id,
-                      email: user.email,
-                      phone: user.phone
-                  }, process.env.secret , {expiresIn: "365d"}, async (err, token) => {
-                    user.Token = token;
-                    await user.save().then((user) => {
-                        return res.status(200).json({
-                            success: true,
-                            message: "Login Successful",
-                            token: token,
-                            User: user
+    await docter.findOne({where: {email: req.body.email }}).then(async user => {
+        if (user) {
+            if (user.is_aprove == false) {
+              return Response.errorResponseWithoutData(
+                  res,
+                  FAIL,
+                  "You do not have permission to login.",
+                  req,
+              )
+            }
+            bcrypt.compare(req.body.password, user.password, (err, result) => {
+                if (result) {
+                    jwt.sign({
+                        id: user.id,
+                        email: user.email,
+                        phone: user.phone
+                    }, process.env.secret , {expiresIn: "365d"}, async (err, token) => {
+                        let data = {}
+                        data = user
+                        data.token = token
+                        await user.save().then((user) => {
+                          return Response.successResponseData(
+                              res,
+                              data,
+                              SUCCESS,
+                              "Login successfully!"
+                          )
                         })
-                    })
-                  });
-              } else {
-                  return res.status(400).json({
-                      success: false,
-                      message: "Invalid Password"
-                  })
-              }
-          });
-      } else {
-          return res.status(400).json({
-              message: "Email does not exist",
-          })
-      }
-  
-  })
+                    });
+                } else {
+                  return Response.errorResponseWithoutData(
+                      res,
+                      FAIL,
+                      "Invalid password",
+                      req,
+                  )
+                }
+            });
+        } else {
+          return Response.errorResponseWithoutData(
+              res,
+              FAIL,
+              "Email does not exist.",
+              req,
+          )
+        }
+    })
 }
 
 
 exports.signupPatient = async (req, res) => {
-    await patient.findOne({where: {email: req.body.email }}).then(async result => {
-        if (!result) {
-            bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(req.body.password, salt, async (err, hash) => {
-                    req.body.password = hash;
-                    let Otp = Math.floor((Math.random() * 1000000) + 1).toString();
-                    req.body.otp = Otp;
-                    req.body.isVerified = false;
-                    req.file?req.body.profilePicture = req.file.filename: null;
-                    const t = await sequelize.transaction();
-                    await patient.create(req.body, { transaction: t }).then(async result => { 
-                        try {
-                            ejs.renderFile(path.join(__dirname, "../views/verifyOtp.ejs"), {
-                                otp: req.body.otp,
-                                name: req.body.name,
-                            }).then(async template => {
-                                    transporter.sendMail({
-                                        to: req.body.email,
-                                        from: "kolonizer",
-                                        subject: "Verify Otp",
-                                        html: template
-                                    }).then(async email => {
-                                        await t.commit();
-                                        return Response.successResponseWithoutData(
-                                          res,
-                                          "Successfully Send email to verifying account",
-                                          SUCCESS
-                                        )
-                                    }).catch(async (err) => {
-                                        await t.rollback();
-                                        return Response.errorResponseWithoutData(
-                                            res,
-                                            "Something went wrong.",
-                                            FAIL
-                                        ) 
-                                    });
-                            }).catch(async (err) =>  {
-                                await t.rollback();
-                                return Response.errorResponseWithoutData(
-                                    res,
-                                    "Something went wrong.",
-                                    FAIL
-                                ) 
-                            })
-                        } catch (err) {
-                                await t.rollback();
-                                return Response.errorResponseWithoutData(
-                                    res,
-                                    "Something went wrong.",
-                                    FAIL
-                                ) 
-                        }
-                    }).catch(async (err) => {
-                        await t.rollback();
-                        return Response.errorResponseWithoutData(
-                            res,
-                            "Something went wrong.",
-                            FAIL
-                        )                     
-                    })
+    const t = await sequelize.transaction();
+    try {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(req.body.password, salt, async (err, hash) => {
+                req.body.password = hash;
+                let Otp = Math.floor((Math.random() * 1000000) + 1).toString();
+                req.body.otp = Otp;
+                req.body.isVerified = false;
+                req.file ? req.body.profilePicture = req.file.filename: null;
+                await patient.create(req.body, { transaction: t }).then(async result => { 
+                    ejs.renderFile(path.join(__dirname, "../views/verifyOtp.ejs"), {
+                            otp: req.body.otp,
+                            name: req.body.name,
+                        }).then(async template => {
+                                transporter.sendMail({
+                                    to: req.body.email,
+                                    from: "kolonizer",
+                                    subject: "Verify Otp",
+                                    html: template
+                                }).then(async email => {
+                                    await t.commit();
+                                    return Response.successResponseWithoutData(
+                                        res,
+                                        SUCCESS,
+                                        "An Email have send to your registerd mail id",
+                                        req
+                                    )
+                                }).catch(async (err) => {
+                                    await t.rollback();
+                                    return Response.errorResponseWithoutData(
+                                        res,
+                                        FAIL,
+                                        "Something went wrong",
+                                        req,
+                                    )
+                                });
+                        }).catch(async (err) =>  {
+                            await t.rollback();
+                            return Response.errorResponseWithoutData(
+                                res,
+                                FAIL,
+                                "Something went wrong",
+                                req,
+                            )
+                        })
+                }).catch(async (err) => {
+                    await t.rollback();
+                    return Response.errorResponseWithoutData(
+                        res,
+                        FAIL,
+                        "Something went wrong",
+                        req,
+                    )                   
                 })
             })
-        }else{
-            return Response.errorResponseWithoutData(
-                res,
-                "Email Already exists",
-                FAIL
-            )
-        }
-    })
+        })
+    } catch (err) {
+        t.rollback()
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong",
+            req,
+        )
+    }
 }
 
 
@@ -270,8 +276,9 @@ exports.patientLogin = async (req, res) => {
             if (user.isVerified == false) {
                 return Response.errorResponseWithoutData(
                     res,
-                    "Invalid Password provided",
-                    FAIL
+                    FAIL,
+                    "Please verify your email address.",
+                    req,
                 )
             }
             bcrypt.compare(req.body.password, user.password, (err, result) => {
@@ -290,23 +297,25 @@ exports.patientLogin = async (req, res) => {
                                 res,
                                 User,
                                 SUCCESS,
-                                "Successfully Send email to verifying account"
+                                "Successfully logIn"
                             )
                       })
                     });
                 } else {
                     return Response.errorResponseWithoutData(
                         res,
-                        "Invalid Password provided",
-                        FAIL
+                        FAIL,
+                        "Invalid password.",
+                        req,
                     )
                 }
             });
         } else {
             return Response.errorResponseWithoutData(
                 res,
-                "Email does not exist",
-                FAIL
+                FAIL,
+                "Email does not exist.",
+                req,
             )
         }
     })
@@ -319,23 +328,27 @@ exports.verifyOtp = async (req, res) => {
             await patient.update({isVerified: true}, {where :{email: req.query.email}}).then(() => {
                 return Response.successResponseWithoutData(
                     res,
-                    
+                    SUCCESS,
+                    "Successfully Verified account",
+                    req
                 )
-                res.status(200).json({
-                    success: true,
-                    message: "OTP Verified"
-                })
             })
         } else {
-            return res.status(400).json({
-                message: "Invalid OTP"
-            })
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Invalid OTP",
+                req,
+            )
         }
     }).catch(err => {
-        return res.status(400).json({
-            message: "Something went wrong",
-            error: err
-        })
+        console.log(err)
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong",
+            req,
+        )
     });
 }
 
@@ -355,11 +368,12 @@ exports.changePasswordDocter = async (req, res) => {
               }
            }).then(users => {
                 if (!users) {
-                    res.status(404).json({
-                        success: false,
-                        message: "Invalid Username Please try With Valid UserName"
-                    });
-                    return "Mismacth";
+                    return Response.errorResponseWithoutData(
+                        res,
+                        FAIL,
+                        "Invalid Username Please try With Valid UserName.",
+                        req,
+                    )
                 }
                 else {
                     var tokenmon = Math.floor((Math.random() * 1000000) + 1).toString()
@@ -379,20 +393,24 @@ exports.changePasswordDocter = async (req, res) => {
                                     html: emailTemplate
                                 })
                             })
-                        res.status(200).json({
-                            success: true,
-                            message: "Successfully send reset-password-link mail"
-                        })
+                            return Response.successResponseWithoutData(
+                                res,
+                                SUCCESS,
+                                "Successfully send reset-password-OTP on mail.",
+                                req
+                            )
                     })
                 }
           })  
         })
     } catch (error) {
-        return res.status(400).json({
-            success: false,
-            message: "Failed to reset Password.",
-            error: error
-        })
+        console.log(error)
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Failed to reset Password.",
+            req,
+        )
     }
 }
 
@@ -402,34 +420,42 @@ exports.newPasswordDocter = async (req, res) => {
         const otp = req.body.otp
         docter.findOne({ where: { reset_password: otp } }).then(user => {
             if (!user) {
-                return res.status(422).json({
-                    message: "user reset Otp not existe"
-                })
+                return Response.errorResponseWithoutData(
+                    res,
+                    FAIL,
+                    "user reset Otp not existe.",
+                    req,
+                )
             }
             bcrypt.genSalt(10, (err, salt) => {
                 bcrypt.hash(newPassword, 10, async (err, hash) => {
                     // user.reset_password = null
                     user.password = hash
                     user.save().then((saveduser) => {
-                        res.json({
-                            message: "Password Updated success"
-                        })
+                        return Response.successResponseWithoutData(
+                            res,
+                            SUCCESS,
+                            "Password Updated successfully.",
+                            req
+                        )
                     })
                 })
             })
         }).catch(err => {
-           return Response.errorResponseData(
-            res,
-            "Failed to send reset-password",
-            req
-           )
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Failed to send reset-password.",
+                req,
+            )
         })
     } catch (err) {
         console.log(err)
-        return Response.errorResponseData(
+        return Response.errorResponseWithoutData(
             res,
-            "Something went wrong",
-            req
+            FAIL,
+            "Something went wrong.",
+            req,
         )
     }
 }
@@ -438,99 +464,109 @@ exports.newPasswordDocter = async (req, res) => {
 // patient 
 exports.changePasswordPatient = async (req, res) => {
     try {
-          crypto.randomBytes(32, (err, buffer) => {
-              if (err) {
-                  console.log(err);
-              }
-              const token = buffer.toString("hex")
-              patient.findOne({
-                where: {
-                    [Op.or]: [
-                        { email: req.body.email },
-                    ]
+            crypto.randomBytes(32, (err, buffer) => {
+                if (err) {
+                    console.log(err);
                 }
-             }).then(users => {
-                  if (!users) {
-                      res.status(404).json({
-                          success: false,
-                          message: "Invalid Username Please try With Valid UserName"
-                      });
-                      return "Mismacth";
+                const token = buffer.toString("hex")
+                patient.findOne({
+                  where: {
+                      [Op.or]: [
+                          { email: req.body.email },
+                      ]
                   }
-                  else {
-                      var tokenmon = Math.floor((Math.random() * 1000000) + 1).toString()
-                      users.reset_password = tokenmon
-                      users.save().then((result) => {
-                          ejs.renderFile(path.join(__dirname, "../views/resetPassword.ejs"),
-                              {
-                                  userName: users.name,
-                                  token: tokenmon,
-                                  // url: process.env.FRONTEND_BASE_URL
-                              })
-                              .then(emailTemplate => {
-                                  transporter.sendMail({
-                                      to: users.email,
-                                      from: 'kolonizer',
-                                      subject: "Password Reset",
-                                      html: emailTemplate
-                                  })
-                              })
-                          res.status(200).json({
-                              success: true,
-                              message: "Successfully send reset-password-link mail"
-                          })
-                      })
-                  }
-            })  
-          })
-      } catch (error) {
-          return res.status(400).json({
-              success: false,
-              message: "Failed to reset Password.",
-              error: error
-          })
-      }
+               }).then(users => {
+                    if (!users) {
+                        return Response.errorResponseWithoutData(
+                            res,
+                            FAIL,
+                            "Invalid Username Please try With Valid UserName",
+                            req,
+                        )
+                    } else {
+                        var tokenmon = Math.floor((Math.random() * 1000000) + 1).toString()
+                        users.reset_password = tokenmon
+                        users.save().then((result) => {
+                            ejs.renderFile(path.join(__dirname, "../views/resetPassword.ejs"),
+                                {
+                                    userName: users.name,
+                                    token: tokenmon,
+                                    // url: process.env.FRONTEND_BASE_URL
+                                })
+                                .then(emailTemplate => {
+                                    transporter.sendMail({
+                                        to: users.email,
+                                        from: 'kolonizer',
+                                        subject: "Password Reset",
+                                        html: emailTemplate
+                                    })
+                                })
+                            return Response.successResponseWithoutData(
+                                res,
+                                SUCCESS,
+                                "Successfully send reset-password-OTP on mail.",
+                                req
+                            )
+                        })
+                    }
+                })  
+            })
+        } catch (error) {
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Invalid Username Please try With Valid UserName",
+                req,
+            )
+        }
   }
   
 
-  // patient
-  exports.newPasswordPatient = async (req, res) => {
-      try {
-          const newPassword = req.body.newPassword
-          const otp = req.body.otp
-          patient.findOne({ where: { reset_password: otp } }).then(user => {
-              if (!user) {
-                  return res.status(422).json({
-                      message: "user reset Otp not existe"
-                  })
-              }
-              bcrypt.genSalt(10, (err, salt) => {
-                  bcrypt.hash(newPassword, 10, async (err, hash) => {
-                      // user.reset_password = null
-                      user.password = hash
-                      user.save().then((saveduser) => {
-                          res.json({
-                              message: "Password Updated success"
-                          })
-                      })
-                  })
-              })
-          }).catch(err => {
-             return Response.errorResponseData(
-              res,
-              "Failed to send reset-password",
-              req
-             )
-          })
-      } catch (err) {
-          console.log(err)
-          return Response.errorResponseData(
-              res,
-              "Something went wrong",
-              req
-          )
-      }
-  }
+exports.newPasswordPatient = async (req, res) => {
+    try {
+        const newPassword = req.body.newPassword
+        const otp = req.body.otp
+        patient.findOne({ where: { reset_password: otp } }).then(user => {
+            if (!user) {
+                return Response.errorResponseWithoutData(
+                    res,
+                    FAIL,
+                    "user reset Otp not exist.",
+                    req,
+                )
+            }
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(newPassword, 10, async (err, hash) => {
+                    // user.reset_password = null
+                    user.password = hash
+                    user.save().then((saveduser) => {
+                        return Response.successResponseWithoutData(
+                            res,
+                            SUCCESS,
+                            "Password Updated successfully.",
+                            req
+                        )
+                    })
+                })
+            })
+        }).catch(err => {
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Invalid Username Please try With Valid UserName",
+                req,
+            )
+        })
+    } catch (err) {
+        console.log(err)
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong.",
+            req,
+        )
+    }
+}
 
 
 exports.signout = (req, res) => {

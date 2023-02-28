@@ -55,7 +55,7 @@ exports.docterUpdate = async (req, res) => {
                 reqObj.identityCardFront? docs.identityCardFront = req.files.identityCardFront[0].filename : null;
                 reqObj.identityCardBack? docs.identityCardBack = req.files.identityCardBack[0].filename : null;
                 reqObj.clinicLicenseFront? docs.clinicLicenseFront = req.files.clinicLicenseFront[0].filename : null;
-                reqObj.clinicLicenseBack? docs.clinicLicenseBack = req.files.clinicLicenseBack[0].filename : null;
+                reqObj.clinicLicenseBack? docs.clinicLicenceBack = req.files.clinicLicenseBack[0].filename : null;
                 reqObj.introVideo? docs.introVideo = req.files.introVideo[0].filename : null;
                 await docterInfo.update(docs, {where: {docter_id: req.profile.id}}, {transaction: t}).then(docterInfo => {
                     if (docterInfo.length) {
