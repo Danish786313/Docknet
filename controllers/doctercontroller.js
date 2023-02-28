@@ -58,7 +58,7 @@ exports.docterUpdate = async (req, res) => {
         reqObj = req.files
         reqObj.profilePicture?  req.body.photo = req.files.profilePicture[0].filename : null;
         await docter.update(req.body, {where: {id: req.profile.id}}, {transaction: t}).then(async docter => {
-            if (docter.length) {
+            if (docter.length != "0") {
                 docs = {}
                 reqObj.logo? docs.logo = req.files.logo[0].filename : null
                 reqObj.licenseFront? docs.licenseFront = req.files.licenseFront[0].filename : null;
@@ -69,7 +69,8 @@ exports.docterUpdate = async (req, res) => {
                 // reqObj.clinicLicenseBack? docs.clinicLicenceBack = req.files.clinicLicenseBack[0].filename : null;
                 reqObj.introVideo? docs.introVideo = req.files.introVideo[0].filename : null;
                 await docterInfo.update(docs, {where: {docter_id: req.profile.id}}, {transaction: t}).then(docterInfo => {
-                    if (docterInfo.length) {
+                    if (docterInfo.length != "0") {
+                        t.commit()
                         return Response.successResponseWithoutData(
                             res,
                             SUCCESS,
@@ -126,12 +127,12 @@ exports.docterUpdate = async (req, res) => {
 
 exports.deleteDocter = async (req, res) => {
     try {
-        let docter = await docter.destroy({where: {id: req.profile.id}})
-        if (docter.length != "0") {
+        let result = await docter.destroy({where: {id: req.profile.id}})
+        if (result.length != "0") {
             return Response.successResponseWithoutData(
                 res,
                 SUCCESS,
-                "Docter profile deleted successfully"
+                "Docter profile deleted successfully."
             )
         } else {
             return Response.errorResponseWithoutData(
