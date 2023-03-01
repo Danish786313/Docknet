@@ -1,5 +1,7 @@
 const { body, param, check } = require('express-validator');
 const { docter, patient } = require("../models");
+const { Op } = require("sequelize");
+
 
 exports.docterRegisterValidation = (req, res) => {
   return [
