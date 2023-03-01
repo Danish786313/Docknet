@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const doctercontroller = require("../controllers/doctercontroller")
 const multer = require("../middleware/upload-docs")
-const { docterRegisterValidation } = require("../validations/authvalidation");
+const { updateProfile } = require("../validations/authvalidation");
 const { validate } = require("../validations/validate")
 const checkAuth = require("../middleware/check-auth")
 
@@ -19,7 +19,7 @@ router.patch('/docter', checkAuth.getLogedInUser, multer.upload.fields(
         {name: "clinicLicenseFront", maxCount:1},
         /* {name: "clinicLicenseBack", maxCount:1} */,
         {name: "introVideo", maxCount:1}
-    ]), docterRegisterValidation(), validate, doctercontroller.docterUpdate);
+    ]), updateProfile(), validate, doctercontroller.docterUpdate);
 
 
 router.get("/docter",  checkAuth.getLogedInUser, doctercontroller.findById)
