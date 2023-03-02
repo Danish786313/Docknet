@@ -161,19 +161,21 @@ exports.verifyOtp = (req, res) => {
 exports.updateProfile = (req, res) => {
     return [
         body('phone').custom(async (value, { req }) => {
-            return await docter.findOne({
-              where: {
-                id: {
-                  [Op.ne]: req.body.phone
-                },
-                phone: value,
-              }, raw: true
-            })
-              .then(docter => {
-                if (docter) {
-                  return Promise.reject('This number is Already Taken')
-                }
-              })
+            if (req.body.phone) {
+                return await docter.findOne({
+                    where: {
+                      id: {
+                        [Op.ne]: req.body.phone
+                      },
+                      phone: value,
+                    }, raw: true
+                  })
+                    .then(docter => {
+                      if (docter) {
+                        return Promise.reject('This number is Already Taken')
+                      }
+                    })
+            }
           }),
     ]
 };
