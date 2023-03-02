@@ -18,13 +18,13 @@ router.post("/patient/login", patientLogin(), validate, authcontroller.patientLo
 
 router.patch('/verifyOtp', verifyOtp(), validate, authcontroller.verifyOtp);
 
-router.post("/forgotPasswordDocter", ForgotPassword(), validate,  checkAuth.getLogedInUser, authcontroller.changePasswordDocter)
+router.post("/forgotPasswordDocter", ForgotPassword(), validate,   authcontroller.changePasswordDocter)
 
-router.post('/newpasswordDocter', newPassword(), validate, checkAuth.getLogedInUser, authcontroller.newPasswordDocter);
+router.post('/newpasswordDocter', newPassword(), validate, authcontroller.newPasswordDocter);
 
-router.post("/forgotPasswordPatinet", ForgotPassword(), validate, checkAuth.getLogedInPatient, authcontroller.changePasswordPatient)
+router.post("/forgotPasswordPatinet", ForgotPassword(), validate, authcontroller.changePasswordPatient)
 
-router.post('/newpasswordPatient', newPassword(), validate, checkAuth.getLogedInPatient,  authcontroller.newPasswordPatient);
+router.post('/newpasswordPatient', newPassword(), validate, authcontroller.newPasswordPatient);
 
 router.get('/signOut', authcontroller.signout);
 
