@@ -53,6 +53,33 @@ exports.prescriptionSetting = async (req, res) => {
     }
 }
 
+exports.prescriptionSettingFile = async (req, res) => {
+    const t = await sequelize.transaction()
+    try{
+        req.body.logo_url = req.files.logoImage[0].filename
+        req.body.signature_url = req.files.signatureImage[0].filename  
+        let data = await prescription_setting.update(req.body, {where:{docter_id: req.profile.id}}, {transaction: t})
+        if (data) {
+            t.commit()
+            return Response.successResponseWithoutData(
+                res,
+                SUCCESS,
+                "Prescription setting files created successfully"
+            )
+        } else {
+            throw new Error("Failed to create")
+        }
+    } catch(err) {
+        t.rollback()
+        console.log(err.message)
+        return Response.errorResponseData(
+            res,
+            "Something went wrong",
+            req,
+        );
+    }
+}
+
 
 exports.getPrescriptionSetting = async (req, res) => {
     try {
@@ -87,9 +114,8 @@ exports.updatePrescriptionSetting = async (req, res) => {
         let data = await prescription_setting.update(req.body, {where: {docter_id: req.profile.id}}, {transaction: t})
         if (data[0] != "0") {
             t.commit()
-            return Response.successResponseData(
+            return Response.successResponseWithoutData(
                 res,
-                data,
                 SUCCESS,
                 "Prescription setting updated Succesfully"
             )

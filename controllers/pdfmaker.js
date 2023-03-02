@@ -1,6 +1,6 @@
 const { SUCCESS, FAIL } = require("../helper/constants");
 const Response = require("../helper/response");
-const { prescription_setting, docter } = require("../models")
+const { prescription_setting, docter, docterInfo } = require("../models")
 const PDFDocument = require('pdfkit');
 const moment = require("moment")
 const path = require("path")
@@ -137,7 +137,9 @@ async function buildPDF2(req, res, dataCallback, endCallback) {
         doc.on('end', endCallback);
         let fileObj = req.files
         let Psetting = await prescription_setting.findOne({where: {docter_id: req.profile.id }})
-        //Line
+        let docterdata = await docter.findOne({where: {id: req.profile.id}, include:[{model: docterInfo}]}) 
+
+        // line
         let line = JSON.parse(Psetting.line)
         doc
             .moveTo(line.start, line.height)
@@ -146,20 +148,20 @@ async function buildPDF2(req, res, dataCallback, endCallback) {
             .stroke();
     
         // logo
-        if (fileObj.logo) {
             let logo = JSON.parse(Psetting.logo)
-            doc.image(path.join(__dirname, `../upload/${req.files.logo[0].filename}`), 
+            if (logo.required == true) {
+                doc.image(path.join(__dirname, `../upload/${Psetting.logo_url.split("/").slice(-1).toString()}`), 
                 logo.horizonAlign, 
                 logo.verticalAlign, {
                     width: logo.width, 
                     height: logo.height,
             })
         }
-    
+            
         //Qrcode
         if (fileObj.qrCode) {
             let qrcode = JSON.parse(Psetting.qrcode)
-            doc.image(path.join(__dirname, `../upload/${req.files.qrCode[0].filename}`), 
+            doc.image(path.join(__dirname, `../upload/${fileObj.qrCode[0].filename}`), 
             qrcode.horizonAlign, 
             qrcode.verticalAlign, {
                     width: qrcode.width, 
@@ -167,24 +169,24 @@ async function buildPDF2(req, res, dataCallback, endCallback) {
             })
         }
         // Name
-        if (req.body.name) {
             let name = JSON.parse(Psetting.name)
-            doc
+            if (name.required == true) {
+                doc
                 .font(name.font)
                 .fontSize(name.fontSize)
-                .fillColor(req.body.name.color)
-                .text("Dr. " + `${req.body.name}`, name.width, name.height)
-        }
-        
+                .fillColor(name.color)
+                .text("Dr. " + name.fullName, name.width, name.height)
+            }
         //speciality
-        if (req.body.speciality) {
             let speciality = JSON.parse(Psetting.speciality)
-            doc
+            if (speciality.required == true) {
+                doc
                 .font(speciality.font)
                 .fontSize(speciality.fontSize)
                 .fillColor(speciality.color)
-                .text(`${req.body.speciality}`, speciality.width, speciality.height)
-        }
+                .text(speciality.speciality, speciality.width, speciality.height)
+            }
+        
         //Title
         let title = JSON.parse(Psetting.title)
         doc
@@ -193,41 +195,46 @@ async function buildPDF2(req, res, dataCallback, endCallback) {
             .fillColor(title.color)
             .text(`${req.body.title}`, title.width, title.height)
         //Cname
-        if (req.body.cname) {
+
             let cname = JSON.parse(Psetting.cname)
-            doc
+            if (cname.required == true) {
+                doc
                 .font(cname.font)
                 .fontSize(cname.fontSize)
                 .fillColor(cname.color)
-                .text(`${req.body.cname}`, cname.width, cname.height)
-        }
+                .text(`${cname.cname}`, cname.width, cname.height)
+            }
+            
+        
         
         // Email
-        if (req.body.email) {
             let email = JSON.parse(Psetting.email)
-            doc
+            if (email.required == true) {
+                doc
                 .font(email.font)
                 .fontSize(email.fontSize)
                 .fillColor(email.color)
-                .text(`${req.body.email}`, email.width, email.height)
-        }
+                .text(`${email.email}`, email.width, email.height)
+            }
+            
+
         // Address
-        if (req.body.address) {
-            let address = JSON.parse(Psetting.address)
+        let address = JSON.parse(Psetting.address)
+        if (address.required == true) {
             doc
-                .font(address.font)
-                .fontSize(address.fontSize)
-                .fillColor(address.color)
-                .text(`${req.body.address}`, address.width, address.height)
+            .font(address.font)
+            .fontSize(address.fontSize)
+            .fillColor(address.color)
+            .text(`${address.address}`, address.width, address.height)
         }
         // phone
-        if (req.body.phone) {
-            let phone = JSON.parse(Psetting.phone)
+        let phone = JSON.parse(Psetting.phone)
+        if (phone.required == true) {
             doc
-                .font(phone.font)
-                .fontSize(phone.fontSize)
-                .fillColor(phone.color)
-                .text(`${req.body.phone}`, phone.width, phone.height)
+            .font(phone.font)
+            .fontSize(phone.fontSize)
+            .fillColor(phone.color)
+            .text(`${phone.phone}`, phone.width, phone.height)
         }
         // patient
         let patient = JSON.parse(Psetting.patient)
@@ -253,14 +260,14 @@ async function buildPDF2(req, res, dataCallback, endCallback) {
             .text(moment().format("LL"), date.width, date.height)
     
         // signature
-        if (fileObj.signature) {
             let signature = JSON.parse(Psetting.signature)
-            doc.image(path.join(__dirname, `../upload/${req.files.signature[0].filename}`), 
+            if (signature.required == true) {
+                doc.image(path.join(__dirname, `../upload/${Psetting.signature_url.split("/").slice(-1).toString()}`), 
                 signature.horizonAlign, 
                 signature.verticalAlign, {
                     width: signature.width, 
                     height: signature.heigth,
-                })
+            })
         }
         
         // Frame

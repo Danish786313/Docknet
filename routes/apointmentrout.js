@@ -5,6 +5,9 @@ const checkOuth = require("../middleware/check-auth")
 const { apointCreate }  = require("../validations/apointmentvalidation")
 const { validate } = require("../validations/validate")
 
+
+// add validation here
+
 router.post("/apointment", /* apointCreate(), validate, */ checkOuth.getLogedInPatient, apointmentController.createApointment)
 
 router.get("/apointment", checkOuth.getLogedInUser, apointmentController.apointments)
@@ -13,6 +16,7 @@ router.patch("/apointment/:id", checkOuth.getLogedInUser, apointmentController.c
 
 
 // ========================  Docter  =================== //
+// add validation here
 router.get("/myApointment", checkOuth.getLogedInUser, apointmentController.myApointments)
 
 router.patch("/apointmentApprove/:id", apointmentController.approveApointment)

@@ -1,4 +1,7 @@
 const { speciality } = require('../models')
+const { Op } = require("sequelize");
+const { SUCCESS, FAIL } = require("../helper/constants")
+const Response = require("../helper/response")
 
 exports.getspeciality = async (req, res, next, id) => {
     await speciality.findByPk(id).then(speciality => {
@@ -17,20 +20,30 @@ exports.getspeciality = async (req, res, next, id) => {
 }
 
 exports.create = async (req, res) => {
-    
-    await speciality.create(req.body).then(speciality => {
-        res.status(200).json({
-            success: true,
-            message: 'speciality added successfully',
-            result: speciality
-        })
-    }).catch(error => {
-            res.status(400).json({
-                success: false,
-                message: 'Something went wrong while adding the speciality',
-                Error: error 
-            })
-        })
+    try {
+        let data = await speciality.create(req.body)
+        if (data) {
+            return Response.successResponseWithoutData(
+                res,
+                SUCCESS,
+                "Specility created successfully",
+            )
+        } else {
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Error while creating speciality.",
+                req,
+            )
+        }
+    } catch (err) {
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong while creating the speciality",
+            req,
+        )
+    }
 }
 
 exports.findOne = async (req, res) => {
@@ -51,28 +64,41 @@ exports.findOne = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-    await speciality.findAll()
-    .then(speciality => {
-        if(speciality.length){
-            res.status(200).json({
-                success: true,
-                message: 'All specialitys fetched successfully',
-                result: speciality
-            })
+    try {
+        let where = {}
+        const { searchText } = req.query;
+        if (searchText) {
+            where = {
+                speciality: {
+                    [Op.like]: `%${searchText}%`
+                }
+            }
+        } 
+        let data = await speciality.findAndCountAll({ where, attributes: ["id", "speciality", "commission"]})
+        if (data) {
+            return Response.successResponseData(
+                res,
+                data.rows,
+                SUCCESS,
+                "Speciality fetched successfully"
+            )
         } else {
-            res.status(400).json({
-                success: false,
-                message: 'No specialitys found',
-                result: speciality
-            })
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Speciality does not exist.",
+                req,
+            )
         }
-    }).catch(error => {
-            res.status(400).json({
-                success: false,
-                message: 'Something went wrong while fetching speciality',
-                Error: error
-            })
-        })
+    } catch (error) {
+        console.log(error)
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong while fetching speciality.",
+            req,
+        )
+    }
 }
 
 

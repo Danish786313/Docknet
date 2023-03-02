@@ -6,18 +6,18 @@ exports.docterRegisterValidation = (req, res) => {
     body('fullName', 'Name is Required').notEmpty().trim(),
     body('gender', 'Gender should be Male female or other').notEmpty().isIn(["Male", "Female", "Other"]).trim(),
     body('email','Email is Required').notEmpty().isEmail().trim(),
-    body('phone','Phone number is Required').notEmpty().isLength({ min: 10, max: 10 }).trim().trim(),
+    body('phone','Phone number is Required').notEmpty().isLength({ min: 10, max: 10 }).trim(),
     body('password', 'Strong password required').notEmpty().trim().isStrongPassword(),
     body('degree','Degree is Required').notEmpty().trim(),
     body('isPharmacist','Please answer the question are you Pharmacist ?').notEmpty().trim(),
     body('phone').custom(async (value, {req}) => {
-        if (req.method == "POST") {
+
             return await docter.findOne({ where: { phone: value }, raw: true }).then(docter => {
               if (docter) {
                 return Promise.reject('This number Already exists. Please choose another')
               }
             })
-        }
+      
     }),
     body('email').custom(async (value, {req}) => {
         if (req.method == "POST") {
@@ -75,11 +75,11 @@ exports.docterRegisterValidation = (req, res) => {
             if (!req.files.clinicLicenseFront) {
                 return Promise.reject("Clinic licence Front is required")
             }
-            if (req.method === "PATCH") {
+           
                 if (!req.files.introVideo) {
                     return Promise.reject("Intro Video is required required")
                 }
-            }
+            
         }
     }),
   ]
@@ -94,7 +94,7 @@ exports.docterlogin = (req, res) => {
 
 exports.ForgotPassword = (req, res) => {
     return [
-        body('email','Email is Required').notEmpty().trim(),
+        body('email','Email is Required').notEmpty().isEmail().trim(),
     ]
 }
 
@@ -108,7 +108,7 @@ exports.newPassword = (req, res) => {
 exports.patientRegister = (req, res) => {
     return [
         body('name', 'Name is Required').notEmpty().trim(),
-        body('phone', 'Phone should be Male female or other').isLength({ min: 10, max: 10 }).trim(),
+        body('phone', '10 digit Phone number is required').isLength({ min: 10, max: 10 }).trim(),
         body('DOB','Date of birth is Required').notEmpty().isDate().trim(),
         body('gender','Gender is Required').notEmpty().isIn(["Male", "Female", "Other"]).trim(),
         body('email', 'Email is password required').notEmpty().isEmail().trim(),
@@ -127,7 +127,7 @@ exports.patientRegister = (req, res) => {
               }
             })
         }),
-        body("Docter").custom(async (value, {req}) => {
+        body("Picture").custom(async (value, {req}) => {
             if (!req.file) {
                 return Promise.reject('Profile picture is required')
             }
@@ -137,7 +137,7 @@ exports.patientRegister = (req, res) => {
 
 exports.patientLogin = (req, res) => {
     return [
-        check('email', 'email is Required').notEmpty().trim(),
+        check('email', 'email is Required').notEmpty().isEmail().trim(),
         check('password', 'Password id required').notEmpty().trim(),
     ]
 }
@@ -154,3 +154,4 @@ exports.verifyOtp = (req, res) => {
         }),
     ]
 }
+

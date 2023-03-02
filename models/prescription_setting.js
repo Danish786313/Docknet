@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.docter, {foreignKey: "docter_id"});
     }
   }
   prescription_setting.init({
@@ -28,7 +29,21 @@ module.exports = (sequelize, DataTypes) => {
     patient: DataTypes.JSON,
     date: DataTypes.JSON,
     signature: DataTypes.JSON,
-    description: DataTypes.JSON
+    description: DataTypes.JSON,
+    logo_url: {
+      type :DataTypes.STRING,
+      get() {
+        const imageName = this.getDataValue('logo_url');
+        return process.env.BACKEND_BASE_URL + '/' + imageName;
+      }
+    },
+    signature_url: {
+      type: DataTypes.STRING,
+      get() {
+        const imageName = this.getDataValue('signature_url');
+        return process.env.BACKEND_BASE_URL + '/' + imageName;
+      }
+    }
   }, {
     sequelize,
     modelName: 'prescription_setting',

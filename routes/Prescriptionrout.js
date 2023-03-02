@@ -5,21 +5,26 @@ const prescriptioncontroller = require("../controllers/prescriptioncontroller")
 const checkAuth = require("../middleware/check-auth")
 const createPrescription = require("../controllers/pdfmaker")
 const multer = require("../middleware/upload-docs")
+const { prescriptionCreate, getPrescription, updatePrescriptionValidation } = require("../validations/prescriptionvalidation")
+const { validate } = require("../validations/validate")
 fs = require("fs")
 
 router.param("prescriptionSettingId", prescriptioncontroller.getSetting)
 
-router.post('/prescriptionSetting', checkAuth.getLogedInUser, prescriptioncontroller.prescriptionSetting)
+router.post('/prescriptionSetting',  checkAuth.getLogedInUser, prescriptionCreate(), validate, prescriptioncontroller.prescriptionSetting)
 
-router.get("/prescriptionSetting", checkAuth.getLogedInUser, prescriptioncontroller.getPrescriptionSetting)
+router.post('/prescriptionSettingFile', checkAuth.getLogedInUser, multer.upload.fields([
+  { name: "signatureImage", maxCount: 1 },
+  { name: "logoImage", maxCount: 1 }
+]), prescriptioncontroller.prescriptionSettingFile)
 
-router.patch("/prescriptionSetting", checkAuth.getLogedInUser, prescriptioncontroller.updatePrescriptionSetting)
+router.get("/prescriptionSetting",  checkAuth.getLogedInUser, prescriptioncontroller.getPrescriptionSetting)
+
+router.patch("/prescriptionSetting", checkAuth.getLogedInUser, updatePrescriptionValidation(), validate, prescriptioncontroller.updatePrescriptionSetting)
 
 router.get('/invoice', checkAuth.getLogedInUser, multer.upload.fields([
-  { name: "logo", maxCount: 1 },
   { name: "qrCode", maxCount: 1 },
-  { name: "signature", maxCount: 1 }
-]), (req, res, next) => {
+]),  getPrescription(), validate, (req, res, next) => {
 
   const fileName = new Date().getTime() + "_invoice" + ".pdf"
   const stream = res.writeHead(200, {

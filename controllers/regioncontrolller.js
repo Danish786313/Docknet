@@ -1,5 +1,63 @@
-const { city } = require("../models")
+const { city, state } = require("../models")
 const { Op } = require("sequelize");
+const { SUCCESS, FAIL } = require("../helper/constants")
+const Response = require("../helper/response")
+
+exports.getstate = async (req, res) => {
+    try {
+        let data = await state.findAll({attributes: ["id", "name"]})
+        if (data.length) {
+            return Response.successResponseData(
+                res,
+                data,
+                SUCCESS,
+                "State fetched successfully",
+            )
+        } else {
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "States does not exist.",
+                req,
+            )
+        }
+    } catch (err) {
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong while fetching state.",
+            req,
+        )
+    }
+}
+
+exports.getcity = async (req, res) => {
+    try {
+        let data = await city.findAll({where: {state_id: req.params.stateId}, attributes: ["id", "state_id", "name"]})
+        if (data.length) {
+            return Response.successResponseData(
+                res,
+                data,
+                SUCCESS,
+                "Cities fetched successfully",
+            )
+        } else {
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "City does not exist.",
+                req,
+            )
+        }
+    } catch (err) {
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong while fetching Cities.",
+            req,
+        )
+    }
+};
 
 const getPagination = (_page, _limit) => {
     const limit = _limit ? +_limit : 20;

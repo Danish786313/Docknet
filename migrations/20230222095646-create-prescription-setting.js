@@ -54,6 +54,12 @@ module.exports = {
       description: {
         type: Sequelize.JSON
       },
+      logo_url: {
+        type: Sequelize.STRING
+      },
+      signature_url: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
