@@ -10,13 +10,24 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       patient_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+          references: {
+            model: 'patients',
+            key: 'id'
+        }
       },
       docter_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+          references: {
+            model: 'docters',
+            key: 'id'
+        }
       },
       stars: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

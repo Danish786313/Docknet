@@ -5,9 +5,8 @@ const Response = require("../helper/response")
 exports.CreateAvailability = async (req, res) => {
     req.body.docter_id = req.profile.id
     await availability.create(req.body).then(async (data) => {
-        return Response.successResponseData(
+        return Response.successResponseWithoutData(
             res,
-            data,
             SUCCESS,
             "Availability created successfully"
         )

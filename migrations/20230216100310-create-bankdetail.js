@@ -11,6 +11,8 @@ module.exports = {
       },
       docter_id: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        unique: true,
         references: {
           model: 'docters',
           key: 'id'
@@ -19,16 +21,21 @@ module.exports = {
         onUpdate: 'cascade'
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       branchName: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       ifscCode: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       accountNo: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true,
+        allowNull: false
       },
       accountType: {
         type: Sequelize.ENUM('Current', 'Saving')

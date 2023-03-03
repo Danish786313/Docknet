@@ -9,7 +9,7 @@ const cors = require('cors');
 require('dotenv').config()
 const { sequelize } = require('./models');
 
-app.use(morgan())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
 app.use(expressLayouts)
 app.set('layout', './layouts/default')
 app.set('view engine', 'ejs')
@@ -43,9 +43,7 @@ const duplicate = require("./routes/duplicateprofilerout")
 app.use(cookieParser());
 app.use(cors())
 
-app.post('/test', (req, res) => {
-    console.log(req.body, "ye")
-    console.log(typeof req.body.time)
+app.get('/test', (req, res) => {
     res.status(200).json({
         message: "Hello in test API"
     })

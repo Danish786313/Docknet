@@ -10,55 +10,79 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       docter_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        unique: true,
+        allowNull: false,
+        references: {
+          model: 'docters',
+          key: 'id'
+        },
+        onDelete: 'cascade',
+        onUpdate: 'cascade'
       },
       logo: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       qrcode: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       name: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       speciality: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       title: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       cname: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       email: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       address: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       phone: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       line: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       patient: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       date: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       signature: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       description: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false
       },
       logo_url: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       signature_url: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,

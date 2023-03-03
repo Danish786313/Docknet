@@ -2,28 +2,6 @@ const { docter, sequelize, patient, docterInfo, admin, bankdetail } = require(".
 const { SUCCESS, FAIL } = require("../helper/constants")
 const Response = require("../helper/response")
 
-exports.getdocter = async (req, res, next, id) => {
-    try {
-        const Docter = await docter.findByPk(id);
-        if (Docter) {
-            req.Docter = Docter;
-            next();
-
-        } else {
-            throw "Docter doesn't exist."
-        }
-    }
-    catch (error) {
-        return Response.errorResponseWithoutData(
-            res,
-            FAIL,
-            "Docter does not exists.",
-            req
-        )
-    }
-}
-
-
 exports.findById = async (req, res) => {
     await docter.findOne({ where:{id : req.profile.id}, include: [{model: docterInfo}, {model: bankdetail}]}).then(data => {
         if (data) {
@@ -62,11 +40,9 @@ exports.docterUpdate = async (req, res) => {
                 docs = {}
                 reqObj.logo? docs.logo = req.files.logo[0].filename : null
                 reqObj.licenseFront? docs.licenseFront = req.files.licenseFront[0].filename : null;
-                // reqObj.licenseBack? docs.licenseBack = req.files.licenseBack[0].filename : null;
                 reqObj.identityCardFront? docs.identityCardFront = req.files.identityCardFront[0].filename : null;
                 reqObj.identityCardBack? docs.identityCardBack = req.files.identityCardBack[0].filename : null;
                 reqObj.clinicLicenseFront? docs.clinicLicenseFront = req.files.clinicLicenseFront[0].filename : null;
-                // reqObj.clinicLicenseBack? docs.clinicLicenceBack = req.files.clinicLicenseBack[0].filename : null;
                 reqObj.introVideo? docs.introVideo = req.files.introVideo[0].filename : null;
                 await docterInfo.update(docs, {where: {docter_id: req.profile.id}}, {transaction: t}).then(docterInfo => {
                     if (docterInfo.length != "0") {

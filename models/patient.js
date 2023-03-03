@@ -12,8 +12,6 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsToMany(models.appointment, {foreignKey: 'patient_id', through: models.docter_patient_appointment})
-      this.hasOne(models.patient, {as: 'child', foreignKey: 'parent_id'})
-      this.belongsTo(models.patient, {as:'parent', foreignKey: 'parent_id'});
     }
   }
   patient.init({
@@ -34,7 +32,6 @@ module.exports = (sequelize, DataTypes) => {
     reset_password: DataTypes.STRING,
     otp: DataTypes.STRING,
     isVerified:DataTypes.BOOLEAN,
-    parent_id: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'patient',

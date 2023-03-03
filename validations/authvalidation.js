@@ -11,15 +11,13 @@ exports.docterRegisterValidation = (req, res) => {
     body('phone','Phone number is Required').notEmpty().isLength({ min: 10, max: 10 }).trim(),
     body('password', 'Strong password required').notEmpty().trim().isStrongPassword(),
     body('degree','Degree is Required').notEmpty().trim(),
-    body('isPharmacist','Please answer the question are you Pharmacist ?').notEmpty().trim(),
+    body('isPharmacist','Please answer the question are you Pharmacist ?').notEmpty().isBoolean().trim(),
     body('phone').custom(async (value, {req}) => {
-
-            return await docter.findOne({ where: { phone: value }, raw: true }).then(docter => {
-              if (docter) {
-                return Promise.reject('This number Already exists. Please choose another')
-              }
-            })
-      
+        return await docter.findOne({ where: { phone: value }, raw: true }).then(docter => {
+          if (docter) {
+            return Promise.reject('This number Already exists. Please choose another')
+          }
+        })
     }),
     body('email').custom(async (value, {req}) => {
         if (req.method == "POST") {
@@ -47,8 +45,11 @@ exports.docterRegisterValidation = (req, res) => {
             if (!req.body.speciality) {
                 return Promise.reject("Please tell us your speciality")
             }
-            if (!req.body.region) {
-                return Promise.reject("Region is required")
+            if (!req.body.state) {
+                return Promise.reject("State is required")
+            }
+            if (!req.body.city) {
+                return Promise.reject("City is required")
             }
             if (!req.body.consultCharge) {
                 return Promise.reject("Consult charge is required")
@@ -65,9 +66,6 @@ exports.docterRegisterValidation = (req, res) => {
             if (!req.files.licenseFront) {
                 return Promise.reject("Licence Front is required")
             }
-            // if (!req.files.licenseBack) {
-            //     return Promise.reject("Licence Back is required")
-            // }
             if (!req.files.identityCardFront) {
                 return Promise.reject("Identity card Front is required")
             }
@@ -76,38 +74,33 @@ exports.docterRegisterValidation = (req, res) => {
             }
             if (!req.files.clinicLicenseFront) {
                 return Promise.reject("Clinic licence Front is required")
-            }
-           
-                if (!req.files.introVideo) {
-                    return Promise.reject("Intro Video is required required")
-                }
-            
+            } 
         }
     }),
   ]
 }
 
-exports.docterlogin = (req, res) => {
+exports.docterloginValidation = (req, res) => {
     return [
-        body('email','Email is Required').notEmpty().trim(),
+        body('email','Email is Required').notEmpty().isEmail().trim(),
         body('password', 'password is required').notEmpty().trim(),
     ]
 }
 
-exports.ForgotPassword = (req, res) => {
+exports.ForgotPasswordValidation = (req, res) => {
     return [
         body('email','Email is Required').notEmpty().isEmail().trim(),
     ]
 }
 
-exports.newPassword = (req, res) => {
+exports.newPasswordValidation = (req, res) => {
     return [
         body('newPassword','New Password is Required It should be strong').notEmpty().isStrongPassword().trim(),
         body('otp','Otp is Required').notEmpty().trim(),
     ]
 }
 
-exports.patientRegister = (req, res) => {
+exports.patientRegisterValidation = (req, res) => {
     return [
         body('name', 'Name is Required').notEmpty().trim(),
         body('phone', '10 digit Phone number is required').isLength({ min: 10, max: 10 }).trim(),
@@ -115,13 +108,13 @@ exports.patientRegister = (req, res) => {
         body('gender','Gender is Required').notEmpty().isIn(["Male", "Female", "Other"]).trim(),
         body('email', 'Email is password required').notEmpty().isEmail().trim(),
         body('password','Password is Required').notEmpty().isStrongPassword().trim(),
-        body('phone').custom(async value => {
-            return await patient.findOne({ where: { phone: value }, raw: true }).then(patient => {
-              if (patient) {
-                return Promise.reject('This number Already exists. Please choose another')
-              }
-            })
-        }),
+        // body('phone').custom(async value => {
+        //     return await patient.findOne({ where: { phone: value }, raw: true }).then(patient => {
+        //       if (patient) {
+        //         return Promise.reject('This number Already exists. Please choose another')
+        //       }
+        //     })
+        // }),
         body('email').custom(async value => {
             return await patient.findOne({ where: { email: value }, raw: true }).then(patient => {
               if (patient) {
@@ -137,14 +130,14 @@ exports.patientRegister = (req, res) => {
     ]
 }
 
-exports.patientLogin = (req, res) => {
+exports.patientLoginValidation = (req, res) => {
     return [
         check('email', 'email is Required').notEmpty().isEmail().trim(),
         check('password', 'Password id required').notEmpty().trim(),
     ]
 }
 
-exports.verifyOtp = (req, res) => {
+exports.verifyOtpValidation = (req, res) => {
     return [
         body('Params').custom(async (value, { req }) => {
             if (!req.query.otp) {

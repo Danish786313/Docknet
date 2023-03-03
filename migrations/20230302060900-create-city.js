@@ -12,17 +12,16 @@ module.exports = {
       state_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-            model: {
-              tableName: 'states',
-            },
-            key: 'id'
-          },
-        onDelete: 'cascade',
-        onUpdate: 'cascade'
+        //   references: {
+        //     model: 'states',
+        //     key: 'id'
+        //   },
+        // onDelete: 'cascade',
+        // onUpdate: 'cascade'
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       createdAt: {
         allowNull: true,

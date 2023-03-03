@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const doctercontroller = require("../controllers/doctercontroller")
 const multer = require("../middleware/upload-docs")
-const { updateProfile } = require("../validations/authvalidation");
+const { docterUpdateValidation } = require("../validations/doctervalidation");
 const { validate } = require("../validations/validate")
 const checkAuth = require("../middleware/check-auth")
 const registerFilesUpload = multer.upload.fields(
@@ -10,21 +10,13 @@ const registerFilesUpload = multer.upload.fields(
         {name: "logo", maxCount: 1},
         {name: "profilePicture", maxCount:1}, 
         {name: "licenseFront", maxCount:1},
-      
         {name: "identityCardFront", maxCount:1},
         {name: "identityCardBack", maxCount:1},
         {name: "clinicLicenseFront", maxCount:1},
-       
         {name: "introVideo", maxCount:1}
     ])
 
-
-
-
-router.param("docterId", doctercontroller.getdocter);
-
-router.patch('/docter', checkAuth.getLogedInUser, registerFilesUpload , docterRegisterValidation(), validate, doctercontroller.docterUpdate);
-
+router.patch('/docter', checkAuth.getLogedInUser, registerFilesUpload, docterUpdateValidation(), validate, doctercontroller.docterUpdate);
 
 router.get("/docter",  checkAuth.getLogedInUser, doctercontroller.findById)
 

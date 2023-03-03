@@ -10,19 +10,35 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       docter_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        unique: true,
+        allowNull: false,
+        references: {
+            model: {
+              tableName: 'docters',
+            },
+            key: 'id'
+          },
+        onDelete: 'cascade',
+        onUpdate: 'cascade'
       },
       days: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        allowNull: false,
       },
       available: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
       },
       date: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: false
       },
       emergency: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,

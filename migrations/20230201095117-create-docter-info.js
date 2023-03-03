@@ -11,6 +11,7 @@ module.exports = {
       },
       docter_id: {
         type: Sequelize.INTEGER,
+        unique: true,
         allowNull: false,
         references: {
             model: {
@@ -22,28 +23,28 @@ module.exports = {
         onUpdate: 'cascade'
       },
       logo: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       introVideo: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       licenseFront: {
-        type: Sequelize.STRING
-      },
-      licenseBack: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       identityCardFront: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       identityCardBack: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       clinicLicenseFront: {
-        type: Sequelize.STRING
-      },
-      clinicLicenceBack: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

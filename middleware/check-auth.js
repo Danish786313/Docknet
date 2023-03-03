@@ -57,3 +57,6 @@ exports.getLogedInPatient =  async (req, res, next) => {
   }
 }
 
+exports.isadmin = async (req, res, next) => {
+  next()
+}

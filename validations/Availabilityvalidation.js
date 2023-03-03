@@ -3,7 +3,7 @@ const { availability } = require("../models");
 
 exports.availabity = (req, res) => {
     return [
-        body('days', 'Day are require required').notEmpty().isArray().trim(),
+        body('days', 'Day are require required').notEmpty().isArray(),
         body('available', 'Availability is is Required').notEmpty().isBoolean().trim(),
         body('emergency', 'Emergency is required').notEmpty().isBoolean().trim(),
         body("docter_id").custom(async (value, {req}) => {
@@ -18,8 +18,8 @@ exports.availabity = (req, res) => {
 
 exports.updateAvailability = (req, res) => {
     return [
-        body('days', 'Day are require required').notEmpty().isArray().trim(),
-        body('available', 'Availability is is Required').notEmpty().isBoolean().trim(),
-        body('emergency', 'Emergency is required').notEmpty().isBoolean().trim(),
+        body('days', 'Day are require required').notEmpty().isArray().optional(),
+        body('available', 'Availability is is Required').notEmpty().isBoolean().trim().optional(),
+        body('emergency', 'Emergency is required').notEmpty().isBoolean().trim().optional(),
     ]
 }

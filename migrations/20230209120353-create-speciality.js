@@ -10,10 +10,12 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       speciality: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       commission: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

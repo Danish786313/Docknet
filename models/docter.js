@@ -38,8 +38,8 @@ module.exports = (sequelize, DataTypes) => {
     experience: DataTypes.INTEGER,
     achivement: DataTypes.STRING,
     speciality: DataTypes.STRING,
-    region: DataTypes.STRING,
-    bank_details: DataTypes.STRING,
+    state: DataTypes.STRING,
+    city: DataTypes.STRING,
     consultCharge: DataTypes.INTEGER,
     otp: DataTypes.STRING,
     is_aprove: {

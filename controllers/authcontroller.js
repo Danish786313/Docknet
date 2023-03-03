@@ -32,11 +32,9 @@ exports.docterregister = async (req, res) => {
                         docs.docter_id =  result.id
                         reqObj.logo? docs.logo = req.files.logo[0].filename : null
                         reqObj.licenseFront? docs.licenseFront = req.files.licenseFront[0].filename : null;
-                        // reqObj.licenseBack? docs.licenseBack = req.files.licenseBack[0].filename : null;
                         reqObj.identityCardFront? docs.identityCardFront = req.files.identityCardFront[0].filename : null;
                         reqObj.identityCardBack? docs.identityCardBack = req.files.identityCardBack[0].filename : null;
                         reqObj.clinicLicenseFront? docs.clinicLicenseFront = req.files.clinicLicenseFront[0].filename : null;
-                        // reqObj.clinicLicenseBack? docs.clinicLicenceBack = req.files.clinicLicenseBack[0].filename : null;
                         await docterInfo.create(docs, { transaction: t })
                             ejs.renderFile(path.join(__dirname, "../views/approvalmail.ejs"), {
                                 name: req.body.fullName,
@@ -109,21 +107,26 @@ exports.aproveDocter = async (req, res) => {
                                     subject: "Your profile has been approved by Admin",
                                     html: template
                                 }).then(async email => {
-                                    return res.status(200).json({
-                                        message: "Email sent",
-                                        Email: email
-                                    })
+                                    return Response.successResponseWithoutData(
+                                        res,
+                                        SUCCESS,
+                                        "profile approved Successfully."
+                                    )
                                 }).catch(async (err) => {
-                                    return res.status(400).json({
-                                        message: "Something went wrong",
-                                        error: err
-                                    })
+                                    return Response.errorResponseWithoutData(
+                                        res,
+                                        FAIL,
+                                        "Something went wrong",
+                                        req,
+                                    )
                                 });
                         }).catch(async (err) =>  { 
-                             return res.status(400).json({
-                                message: "Something went wrong",
-                                error: err
-                             })
+                            return Response.errorResponseWithoutData(
+                                res,
+                                FAIL,
+                                "Something went wrong",
+                                req,
+                            )
                         })
                     } catch (err) {
                         return res.status(400).json({
@@ -132,10 +135,12 @@ exports.aproveDocter = async (req, res) => {
                         })
                     }
             }).catch(err => {
-                return res.status(400).json({
-                    success: true,
-                    message: "Docter Approved Successfully"
-                })
+                return Response.errorResponseWithoutData(
+                    res,
+                    FAIL,
+                    "Something went wrong",
+                    req,
+                )
             });
         } else {
             return res.status(400).json({
@@ -227,7 +232,7 @@ exports.signupPatient = async (req, res) => {
                                     return Response.successResponseWithoutData(
                                         res,
                                         SUCCESS,
-                                        "An Email have send to your registerd mail id",
+                                        "An Email have send to your registerd mail id for verification.",
                                         req
                                     )
                                 }).catch(async (err) => {

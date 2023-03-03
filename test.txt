@@ -395,3 +395,72 @@ npx sequelize-cli model:generate --name review --attributes patient_id:integer,d
         }
     });
 };
+
+ // this.hasOne(models.patient, {as: 'child', foreignKey: 'parent_id'})
+      // this.belongsTo(models.patient, {as:'parent', foreignKey: 'parent_id'});
+
+      exports.createslots = async (req, res) => {
+    try {
+        let start = moment(req.body.start, ['h:m a', 'H:m'])
+        let end = moment(req.body.end, ['h:m a', 'H:m'])
+        let slots = []
+        while (true) { 
+            if (start.isBefore(end)) {
+                slots.push(start.format('HH:mm'))
+                start.add(parseInt(req.body.period), 'm')
+            } else {
+                slots.push(start.format('HH:mm'))
+                break
+            }
+        }
+        post = {
+            docter_id : req.profile.id,
+            start: moment(req.body.start, ['h:m', 'H:m']).format(),
+            end: moment(req.body.end, ['h:m', 'H:m']).format(),
+            slots: slots,
+        }
+        let data = await slottime.create(post)
+        if (data) {
+            return Response.successResponseWithoutData(
+                res,
+                SUCCESS,
+                "SuccessFully creaed slot.",
+                req
+            )
+        } else {
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Error while creating slot.",
+                req,
+            )
+        }
+    } catch (err) {
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Somethoong went wrong while creating slot.",
+            req,
+        )
+    }
+}
+ "period": "30"
+ let slots = []
+        while (true) { 
+            if (start.isBefore(end)) {
+                slots.push(start.format('HH:mm'))
+                start.add(parseInt(req.body.period), 'm')
+            } else {
+                slots.push(start.format('HH:mm'))
+                break
+            }
+        }
+
+
+ "dialectOptions": {
+      "useUTC": false, 
+      "dateStrings": true,
+      "typeCast": true
+}
+
+ attributes: { exclude: ['password'] },

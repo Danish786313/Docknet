@@ -37,13 +37,6 @@ module.exports = (sequelize, DataTypes) => {
         return process.env.BACKEND_BASE_URL + '/' + imageName;
       }
     },
-    licenseBack: {
-      type: DataTypes.STRING,
-      get() {
-        const imageName = this.getDataValue('licenseBack');
-        return process.env.BACKEND_BASE_URL + '/' + imageName;
-      }
-    },
     identityCardFront: {
       type: DataTypes.STRING,
       get() {
@@ -62,13 +55,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       get() {
         const imageName = this.getDataValue('clinicLicenseFront');
-        return process.env.BACKEND_BASE_URL + '/' + imageName;
-      }
-    },
-    clinicLicenceBack: {
-      type: DataTypes.STRING,
-      get() {
-        const imageName = this.getDataValue('clinicLicenceBack');
         return process.env.BACKEND_BASE_URL + '/' + imageName;
       }
     },

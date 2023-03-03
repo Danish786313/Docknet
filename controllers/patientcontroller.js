@@ -33,7 +33,8 @@ exports.findOne = async (req, res) => {
 }
 
 exports.update = async (req, res) => {
-    const t = sequelize.transaction()
+    console.log(req.body)
+    const t = await sequelize.transaction();
     try {
         req.file ? req.body.profilePicture = req.file.filename: null
         let result = await patient.update(req.body, {where: {id: req.profile.id}}, {transaction: t})

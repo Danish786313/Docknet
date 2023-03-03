@@ -32,6 +32,7 @@ module.exports = {
       apointment_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        unique: true,
         references: {
             model: {
               tableName: 'appointments',
