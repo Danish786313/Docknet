@@ -11,6 +11,8 @@ router.post("/slots", checkOuth.getLogedInUser, CreateSlotValidation(), validate
 
 router.post("/addtime/:slotId", checkTimeValidation(), slotController.addTime)
 
+router.delete("/removeTime/:slotId", slotController.removeTime)
+
 router.get("/slots",  checkOuth.getLogedInUser, slotController.findAll)
 
 router.patch("/slots/:slotId", checkOuth.getLogedInUser, slotController.updateSlots)

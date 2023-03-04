@@ -464,3 +464,22 @@ npx sequelize-cli model:generate --name review --attributes patient_id:integer,d
 }
 
  attributes: { exclude: ['password'] },
+
+ npx sequelize-cli model:generate --name slot --attributes availability_id:integer,start:date,end:date,slots:json
+
+
+ npx sequelize-cli model:generate --name availability --attributes docter_id:integer,sunday:boolean,monday:boolean,tuesday:boolean,wednesday:boolean,thursday:Boolean,friday:Boolean,saturday:boolean,available:boolean,emergency:boolean
+
+
+// let days = JSON.parse(isavailable.days)
+        // for (let i = 0; i <= days.length; i++) {
+        //     if (days[i] == reqDay) {
+        //         break;
+        //     }
+        //     return res.status(400).json({
+        //         message: "This date Docter is not available"
+        //     })
+        // }
+        return
+        // this.belongsToMany(models.payment, {foreignKey: 'payment_id', through: models.docter_patient_appointment})
+        this.belongsToMany(models.appointment, {foreignKey: 'payment_id', through: models.docter_patient_appointment})

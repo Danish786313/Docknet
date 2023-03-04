@@ -87,7 +87,7 @@ exports.updateReview = async (req, res) => {
     const t = await sequelize.transaction();
     try {
         let data = await review.update(req.body, {where: {id: req.params.reviewId}}, {transaction: t})
-        if (data[0] != "0") {
+        if (data[0] != 0) {
             t.commit()
             return Response.successResponseWithoutData(
                 res,

@@ -40,16 +40,6 @@ module.exports = {
             key: 'id'
           },
       },
-      payment_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-            model: {
-              tableName: 'payments',
-            },
-            key: 'id'
-          },
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

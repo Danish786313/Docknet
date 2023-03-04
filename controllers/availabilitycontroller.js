@@ -3,22 +3,53 @@ const { SUCCESS, FAIL } = require("../helper/constants")
 const Response = require("../helper/response")
 
 exports.CreateAvailability = async (req, res) => {
-    req.body.docter_id = req.profile.id
-    await availability.create(req.body).then(async (data) => {
-        return Response.successResponseWithoutData(
-            res,
-            SUCCESS,
-            "Availability created successfully"
-        )
-    }).catch((err) => {
+    try {
+        let user = await availability.findOne({where: {docter_id: req.profile.id}})
+        if (!user) {
+            req.body.docter_id = req.profile.id
+            let result = await availability.create(req.body)
+            if (result) {
+                return Response.successResponseWithoutData(
+                    res,
+                    SUCCESS,
+                    "Availability created successfully.",
+                    req
+                )
+            } else {
+                return Response.errorResponseWithoutData(
+                    res,
+                    FAIL,
+                    "Failed to create availability.",
+                    req
+                )
+            }
+        } else {
+            let result = await availability.update(req.body, {where: {docter_id: req.profile.id}})
+            if (result[0] != 0) {
+                return Response.successResponseWithoutData(
+                    res,
+                    SUCCESS,
+                    "Availability updated successfully.",
+                    req
+                )
+            } else {
+                return Response.errorResponseWithoutData(
+                    res,
+                    FAIL,
+                    "Failed to update availability.",
+                    req
+                )
+            }
+        }
+    } catch (err) {
         console.log(err)
         return Response.errorResponseWithoutData(
             res,
             FAIL,
-            "Something went wrong while creating the availability",
-            req,
+            "Something went wrong.",
+            req
         )
-    });
+    }
 }
 
 exports.getAvailability = async (req, res) => {

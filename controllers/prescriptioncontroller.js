@@ -112,7 +112,7 @@ exports.updatePrescriptionSetting = async (req, res) => {
     let t = await sequelize.transaction()
     try {
         let data = await prescription_setting.update(req.body, {where: {docter_id: req.profile.id}}, {transaction: t})
-        if (data[0] != "0") {
+        if (data[0] != 0) {
             t.commit()
             return Response.successResponseWithoutData(
                 res,

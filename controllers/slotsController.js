@@ -71,54 +71,67 @@ exports.createslots = async (req, res) => {
 }
 
 exports.addTime = async (req, res) => {
-    let t = await sequelize.transaction()
+    // let t = await sequelize.transaction()
     try {
         let time = await slottime.findOne({where: {id: req.params.slotId}})
 
         // check if time is already in the database
-        timeArr = JSON.parse(time.slots)
-        for (let i=0; i<=timeArr.length; i++) {
-            if (timeArr[i] == req.body.slot){
-                return Response.errorResponseWithoutData(
-                    res,
-                    FAIL,
-                    "Slot time already exists.",
-                    req
-                )
+        let timeArr = []
+        if (time.slots) {
+            timeArr = JSON.parse(time.slots)
+            for (let i=0; i<=timeArr.length; i++) {
+                if (timeArr[i] == req.body.slot){
+                    return Response.errorResponseWithoutData(
+                        res,
+                        FAIL,
+                        "Slot time already exists.",
+                        req
+                    )
+                }
             }
         }
-
-        let start = moment(time.start, ['h:m a', 'H:m'])
-        let end = moment(time.end, ['h:m a', 'H:m'])
-        let slot = moment(req.body.slot, ['h:m a', 'H:m'])
-        console.log(start.format('hh:mm'), slot.format('hh:mm'), end.format('hh:mm'))
-    
-        let slots = []
-        console.log(timeArr.push(slot.format('hh:mm')))
         
-        if (slot.isSame(slot) || slot.isAfter(start) && slot.isBefore(end)) {
-            slots.push(slot.format('hh:mm'))
-            timeArr.push(slot.format('hh:mm'))
-        }
+        let start = moment(time.start, ['h:m', 'H:m'])
+        let end = moment(time.end, ['h:m', 'H:m'])
+        let slot = moment(req.body.slot, ['h:m', 'H:m'])
+        console.log(start.format('HH:mm'), slot.format('HH:mm'), end.format('HH:mm'))
+    
+        let slots = []        
+        let result
+        let temp
+        if (slot.isAfter(start) && slot.isBefore(end)) {
+            temp = slot.format('HH:mm')
+            console.log(temp)
+            result = timeArr.concat(temp)
+            req.body.slots = result
+            // let data = await slottime.update(req.body, {where: {id: req.params.slotId}}, {transaction: t})
+            let data = await slottime.update(req.body, {where: {id: req.params.slotId}})
 
-        let data = await slottime.update(timeArr, {where: {id: req.params.slotId}}, {transaction: t})
-        if (data[0] = "0") {
-            t.commit()
-            Response.successResponseWithoutData(
-                res,
-                SUCCESS,
-                "Time added successfully."
-            )
+            if (data[0] = "0") {
+                // await t.commit()
+                Response.successResponseWithoutData(
+                    res,
+                    SUCCESS,
+                    "Time added successfully."
+                )
+            } else {
+                // await t.rollback()
+                Response.errorResponseWithoutData(
+                    res,
+                    FAIL,
+                    "Something went wrong while adding the time slot."
+                )
+            }
         } else {
-            t.rollback()
-            Response.errorResponseWithoutData(
+            return Response.errorResponseWithoutData(
                 res,
                 FAIL,
-                "Something went wrong while adding the time slot."
+                "Consultation time should be under the time slot.",
+                req
             )
         }
     } catch (err) {
-        t.rollback()
+        // t.rollback()
         console.log(err)
         Response.errorResponseWithoutData(
             res,
@@ -126,6 +139,40 @@ exports.addTime = async (req, res) => {
             "Something went wrong while adding the time slot."
         )
     }
+}
+
+exports.removeTime = async (req, res) => { 
+    try {
+        let data = await slottime.findOne({where: {id: req.params.slotId}})
+        timeArr = JSON.parse(data.slots)
+        timeArr.pop()
+        req.body.slots = timeArr
+        let result = await slottime.update(req.body, {where: {id: req.params.slotId}})
+        console.log(result)
+        if (result[0] != 0) {
+            return Response.successResponseWithoutData(
+                res,
+                SUCCESS,
+                "Time removed successfully."
+            )
+        } else {
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Something went wrong while removing the time slot.",
+                req
+            )
+        }
+    } catch (err) {
+        console.log(err)
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            "Something went wrong while removing the time slot.",
+            req
+        )
+    }
+    
 }
 
 exports.findAll = async (req, res) => {

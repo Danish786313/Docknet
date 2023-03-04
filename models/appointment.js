@@ -13,11 +13,11 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.belongsToMany(models.patient, {foreignKey: 'patient_id', through: models.docter_patient_appointment})
       this.belongsToMany(models.docter, {foreignKey: 'docter_id', through: models.docter_patient_appointment})
-      this.belongsToMany(models.payment, {foreignKey: 'payment_id', through: models.docter_patient_appointment})
+      
     }
   }
   appointment.init({
-    date: DataTypes.DATE,
+    date: DataTypes.DATEONLY,
     time: DataTypes.STRING,
     patient_name: DataTypes.STRING,
     age: DataTypes.INTEGER,

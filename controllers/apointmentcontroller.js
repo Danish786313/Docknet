@@ -1,57 +1,64 @@
 const { appointment, sequelize, docter_patient_appointment, patient, docter, availability, payment } = require("../models");
 const moment = require("moment")
+const { SUCCESS, FAIL } = require("../helper/constants")
+const Response = require("../helper/response")
 
 exports.createApointment = async (req, res) => {
+    const t = await sequelize.transaction();
     try {
         let reqDay = moment(req.body.date).format('dddd'); // Wednesday
-        let isavailable = await availability.findOne({where: {docter_id: req.body.docter_id}})
-        let days = JSON.parse(isavailable.days)
-        for (let i = 0; i <= days.length; i++) {
-            if (days[i] == reqDay) {
-                break;
-            }
-            return res.status(400).json({
-                message: "This date Docter is not available"
-            })
-        }
-        
-        let gettime = moment(req.body.time, ['h:m a', 'H:m'])
-        let isCreated = await appointment.findAll({ where: {date: req.body.date}, 
-                include: [{model: docter, where: {id: req.body.docter_id}}]})
+        let isavailable = await availability.findOne({where: {docter_id: req.body.docter_id}, attributes: [reqDay]})
+        if (!Object.values(isavailable.dataValues)[0]) {
+            return Response.errorResponseWithoutData(
+                res,
+                SUCCESS,
+                "Docter is not available on this day.",
+                req
+            )
+        } 
+       
+        let gettime = moment(req.body.time, ['h:m', 'H:m'])
 
-        isCreated.forEach(element => {
-            if (moment(element.time, ['h:m a', 'H:m']).isSame(gettime)){
-                throw new Error("Apointment already exists in this Time")
+        let isCreated = await appointment.findAll({where: {date: req.body.date},
+                include: [{model: docter, where: {id: req.body.docter_id}}]
+            })
+
+            isCreated.forEach(element => {
+            if (moment(element.time, ['h:m', 'H:m']).isSame(gettime)) {
+                throw new Error("Apointment already exists in this Time.")
             }
         });
 
-            // const t = await sequelize.transaction();
-            await appointment.create(req.body, /* {transaction : t } */).then(async (appointment) => {
-                post = {
-                    docter_id: req.body.docter_id,
-                    patient_id: req.profile.id,
-                    apointment_id: appointment.id,
-                    payment_id: req.body.payment_id
-                }
-                await docter_patient_appointment.create(post, /* {transaction : t} */).catch(err => {
-                    // t.rollback()
-                    console.log(err)
-                })
-                // t.commit()
-                return res.status(200).json({ 
-                    message: "Appointment created successfully" 
-                })
-            }).catch(err => {
-                // t.rollback()
-                return res.status(500).json({ 
-                    message: "Appointment creation failed" 
-                })
-            });
-        
+        let aptmnt = await appointment.create(req.body, {transaction : t })
+        let post = {
+            docter_id: req.body.docter_id,
+            patient_id: req.profile.id,
+            apointment_id: aptmnt.id,
+        }
+        let data = await docter_patient_appointment.create(post, {transaction : t})
+        if (aptmnt && data) {
+            await t.commit()
+            return Response.successResponseWithoutData(
+                res,
+                SUCCESS,
+                "Apointment request successfully send to docter."
+            )
+        } else {
+            await t.rollback()
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                "Apointment request failed to send to docter."
+            )
+        }
     } catch (err) {
-        return res.status(400).send({
-            Error: err.message
-        })
+        await t.rollback()
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            err.message ? err.message : "Apointment request failed to send to docter.",
+            req
+        )
     } 
 }
 
@@ -124,6 +131,21 @@ exports.approveApointment = async (req, res) => {
 }
 
 exports.myApointments = async (req, res) => {
+    try {
+        await docter_patient_appointment.findAll({
+            where: {docter_id: req.profile.id}, 
+            include: [
+                {model: appointment,
+                where: {status: req.query.status},
+                },
+                {model:patient}
+            ]}).then(data => {
+            res.json(data)
+        })
+    } catch (err) {
+
+    }
+    return
     await appointment.findAll({
         include: [{
             model: docter,
@@ -140,4 +162,12 @@ exports.myApointments = async (req, res) => {
             message: "Failed to fetch applications"
         })
     })
+}
+
+exports.acceptApointments = async (req, res) => {
+    try {
+        let result = await appointment.update({status:"Upcoming"})
+    } catch(err) {
+
+    }
 }

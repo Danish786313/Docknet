@@ -22,23 +22,41 @@ module.exports = {
         onDelete: 'cascade',
         onUpdate: 'cascade'
       },
-      days: {
-        type: Sequelize.JSON,
+      Sunday: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+      Monday: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+      Tuesday: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+      Wednesday: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+      Thursday: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+      Friday: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+      Saturday: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
       },
       available: {
         type: Sequelize.BOOLEAN,
-        defaultValue: false,
         allowNull: false,
-      },
-      date: {
-        type: Sequelize.DATE,
-        allowNull: false
       },
       emergency: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: false
       },
       createdAt: {
         allowNull: false,

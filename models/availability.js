@@ -15,9 +15,15 @@ module.exports = (sequelize, DataTypes) => {
   }
   availability.init({
     docter_id: DataTypes.INTEGER,
-    days: DataTypes.JSON,
+    Sunday: DataTypes.BOOLEAN,
+    Monday: DataTypes.BOOLEAN,
+    Tuesday: DataTypes.BOOLEAN,
+    Wednesday: DataTypes.BOOLEAN,
+    Thursday: DataTypes.BOOLEAN,
+    Friday: DataTypes.BOOLEAN,
+    Saturday: DataTypes.BOOLEAN,
     available: DataTypes.BOOLEAN,
-    emergency: DataTypes.BOOLEAN,
+    emergency: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'availability',

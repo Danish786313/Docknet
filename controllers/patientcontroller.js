@@ -38,7 +38,7 @@ exports.update = async (req, res) => {
     try {
         req.file ? req.body.profilePicture = req.file.filename: null
         let result = await patient.update(req.body, {where: {id: req.profile.id}}, {transaction: t})
-        if (result[0] != "0") {
+        if (result[0] != 0) {
             t.commit()
             return Response.successResponseWithoutData(
                 res,

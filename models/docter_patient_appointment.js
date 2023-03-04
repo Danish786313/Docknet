@@ -20,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
     docter_id: DataTypes.INTEGER,
     patient_id: DataTypes.INTEGER,
     apointment_id: DataTypes.INTEGER,
-    payment_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'docter_patient_appointment',

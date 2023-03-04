@@ -297,6 +297,7 @@ exports.patientLogin = async (req, res) => {
                         user.Token = token
                         user.save().then(() => {
                             let User = {}
+                            delete user.password
                             User = user
                             User.token = token
                             return Response.successResponseData(
