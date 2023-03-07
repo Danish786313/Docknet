@@ -2,31 +2,31 @@ const express = require("express")
 const router = express.Router()
 const apointmentController = require("../controllers/apointmentcontroller")
 const checkOuth = require("../middleware/check-auth")
-const { apointCreate }  = require("../validations/apointmentvalidation")
+const { apointCreateValidation, getApointmentValidation, UpdateApointmentValidation }  = require("../validations/apointmentvalidation")
 const { validate } = require("../validations/validate")
-
 
 
 // ========================  Docter  =================== //
 // add validation here
-router.get("/myApointment", checkOuth.getLogedInUser, apointmentController.myApointments)
 
-router.patch("/AcceptApointment/:id", checkOuth.getLogedInUser, apointmentController.acceptApointments)
+router.get("/myApointment", getApointmentValidation(), validate, checkOuth.getLogedInUser, apointmentController.myApointments)
 
-router.patch("/apointmentApprove/:id", apointmentController.approveApointment)
+router.patch("/myApointment", UpdateApointmentValidation(), validate, checkOuth.getLogedInUser, apointmentController.UpdatemyApointments)
 
-router.patch("/apointmentReshedule/:id", apointmentController.resheduleApointment)
-
-
+// ========================  Patient  =================== //
 // add validation here
 
-router.post("/apointment", apointCreate(), validate, checkOuth.getLogedInPatient, apointmentController.createApointment)
+router.post("/apointment", apointCreateValidation(), validate, checkOuth.getLogedInPatient, apointmentController.createApointment)
 
-router.get("/apointment", checkOuth.getLogedInUser, apointmentController.apointments)
-
-router.patch("/apointment/:id", checkOuth.getLogedInUser, apointmentController.cancelApointment)
-
-
-
+router.get("/apointment", checkOuth.getLogedInPatient, apointmentController.apointments)
 
 module.exports = router
+
+/*
+
+Request,
+Reshedule
+Upcoming [paid, unpaid]
+Cancelled
+
+ */

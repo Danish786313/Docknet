@@ -483,3 +483,7 @@ npx sequelize-cli model:generate --name review --attributes patient_id:integer,d
         return
         // this.belongsToMany(models.payment, {foreignKey: 'payment_id', through: models.docter_patient_appointment})
         this.belongsToMany(models.appointment, {foreignKey: 'payment_id', through: models.docter_patient_appointment})
+
+
+3312
+npx sequelize-cli model:generate --name health_record --attributes fullName:string,DOB:date,gender:enum:'{'Male','Female'}',consent:boolean,shareRecord:boolean,emergency_contact:json,health_metrics:json,drug_allergies:json,other_allergies:json,vaccination:json,diseases:json,medication:json,smoking:Boolean,drinking_alcohol:Boolean

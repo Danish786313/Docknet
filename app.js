@@ -39,11 +39,13 @@ const slots = require("./routes/slotsrout")
 const prescription = require("./routes/Prescriptionrout")
 const review = require("./routes/reviewrout")
 const duplicate = require("./routes/duplicateprofilerout")
+const healthRecord = require("./routes/healthrecordrout")
 
 app.use(cookieParser());
 app.use(cors())
 
 app.get('/test', (req, res) => {
+    console.log(req.body)
     res.status(200).json({
         message: "Hello in test API"
     })
@@ -65,6 +67,7 @@ app.use("/api", slots)
 app.use("/api", prescription)
 app.use("/api", review)
 app.use("/api", duplicate)
+app.use("/api", healthRecord)
 // app.use("/master/document", express.static("document"));
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + 'public/images'));

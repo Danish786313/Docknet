@@ -22,6 +22,6 @@ router.get("/docter",  checkAuth.getLogedInUser, doctercontroller.findById)
 
 router.delete("/docter", checkAuth.getLogedInUser, doctercontroller.deleteDocter)
 
-router.get("/SearchPatient", doctercontroller.searchPatient)
+router.get("/SearchPatient", checkAuth.getLogedInUser, doctercontroller.searchPatient)
 
 module.exports = router

@@ -2,6 +2,8 @@ const { appointment, sequelize, docter_patient_appointment, patient, docter, ava
 const moment = require("moment")
 const { SUCCESS, FAIL } = require("../helper/constants")
 const Response = require("../helper/response")
+const Helper = require("../helper/helper")
+const { Op } = require("sequelize")
 
 exports.createApointment = async (req, res) => {
     const t = await sequelize.transaction();
@@ -63,111 +65,168 @@ exports.createApointment = async (req, res) => {
 }
 
 exports.apointments = async (req, res) => {
-    await appointment.findAll({
-        include: [{
-            model: patient,
-            where: {id: req.profile.id},
-        }],
-        where: {status: req.query.status}
-    }).then(result => {
-        res.status(200).json({
-            message: "All applications fetched successfully",
-            result: result
-        })
-    }).catch(err => {
-        res.status(500).json({
-            message: "Failed to fetch applications"
-        })
-    })
-}
-
-exports.cancelApointment = async (req, res) => {
-    await sequelize.transaction(async (t) => {
-        await appointment.update({status: "Cancelled"}, {where: {id: req.params.id}}, {transaction : t}).then(async (appointment) => {
-            res.status(200).json({ 
-                message: "Appointment cancelled successfully" 
-            })
-        }).catch(err => {
-            res.status(500).json({ 
-                message: "Appointment cancellation failed"
-            })
-        });
-    })
-}
-
-/* =========================== Docter ================================ */
-exports.resheduleApointment = async (req, res) => {
-    await sequelize.transaction(async (t) => {
-        await appointment.update({
-            status: "Reshedule",
-            date: req.body.date,
-            time: req.body.time
-        }, {where: {id: req.params.id}, transaction : t}).then(async (appointment) => {
-            res.status(200).json({ 
-                message: "Appointment rescheduled successfully" 
-            })
-        }).catch(err => {
-            res.status(500).json({ 
-                message: "Appointment reschedule failed" 
-            })
-        });
-    })
-}
-
-exports.approveApointment = async (req, res) => {
-    await sequelize.transaction(async (t) => {
-        await appointment.update({
-            status: "Upcoming"
-        }, {where: {id: req.params.id}, transaction : t}).then(async (appointment) => {
-            res.status(200).json({ 
-                message: "Appointment approved successfully" 
-            })
-        }).catch(err => {
-            res.status(500).json({ 
-                message: "Appointment approval failed" 
-            })
-        });
-    })
-}
-
-exports.myApointments = async (req, res) => {
     try {
-        await docter_patient_appointment.findAll({
+        const { _page, _limit, status, searchText } = req.query;
+        const { limit, offset } = Helper.getPagination(_page, _limit);
+
+        let where = {}
+        if (searchText) {
+            where = {
+                [Op.or]: [
+                    { name: { [Op.like]: "%" + searchText + "%" } },
+                    { phone: { [Op.like]: "%" + searchText + "%" } },
+                    { email: { [Op.like]: "%" + searchText + "%" } },
+                ],
+            };
+        }
+
+        let data = await docter_patient_appointment.findAndCountAll({
+            limit,
+            offset,
             where: {docter_id: req.profile.id}, 
             include: [
                 {model: appointment,
-                where: {status: req.query.status},
+                    where: {status: status},
                 },
-                {model:patient}
-            ]}).then(data => {
-            res.json(data)
-        })
+                {model:docter, where}
+            ]})
+        const response = Helper.getPagingData(data, _page, limit);
+        if (response.items.length) {
+            Response.successResponseData(
+                res,
+                response,
+                SUCCESS,
+                `${status} apointments fetched successfully.`
+            )
+        } else {
+            Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                `${status} apointments does not exist.`,
+                req
+            )
+        }
     } catch (err) {
-
+        console.log(err)
+        Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            `Something went wrong while fetching apointment details.`,
+            req
+        )
     }
-    return
-    await appointment.findAll({
-        include: [{
-            model: docter,
-            where: {id: req.profile.id},
-        }],
-        where: {status: req.query.status}
-    }).then(result => {
-        res.status(200).json({
-            message: "All applications fetched successfully",
-            result: result
-        })
-    }).catch(err => {
-        res.status(500).json({
-            message: "Failed to fetch applications"
-        })
-    })
 }
 
-exports.acceptApointments = async (req, res) => {
-    try {
-        let result = await appointment.update({status:"Upcoming"})
-    } catch(err) {
 
+
+/* =========================== Docter ================================ */
+exports.myApointments = async (req, res) => {
+    try {
+        const { _page, _limit, status, searchText } = req.query;
+        const { limit, offset } = Helper.getPagination(_page, _limit);
+
+        let where = {}
+        if (searchText) {
+            where = {
+                [Op.or]: [
+                    { name: { [Op.like]: "%" + searchText + "%" } },
+                    { phone: { [Op.like]: "%" + searchText + "%" } },
+                    { email: { [Op.like]: "%" + searchText + "%" } },
+                ],
+            };
+        }
+        
+        let data = await docter_patient_appointment.findAndCountAll({
+            limit,
+            offset,
+            where: {docter_id: req.profile.id}, 
+            include: [
+                {model: appointment,
+                    where: {status: status},
+                },
+                {model:patient, where}
+            ]})
+        const response = Helper.getPagingData(data, _page, limit);
+        if (response.items.length) {
+            Response.successResponseData(
+                res,
+                response,
+                SUCCESS,
+                `${status} apointments fetched successfully.`
+            )
+        } else {
+            Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                `${status} apointments does not exist.`,
+                req
+            )
+        }
+    } catch (err) {
+        console.log(err)
+        Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            `Something went wrong while fetching apointment details.`,
+            req
+        )
+    }
+}
+
+exports.UpdatemyApointments = async (req, res) => {
+    try {
+        const { status, ApointmentId } = req.query
+        let result = await appointment.findByPk(ApointmentId)
+        if (!result) {
+            throw new Error("Appointment not found.")
+        }
+
+        if (status == "Reshedule") {
+            let reqDay = moment(req.body.date).format('dddd'); // Wednesday
+            let isavailable = await availability.findOne({where: {docter_id: req.profile.id}, attributes: [reqDay]})
+            if (!Object.values(isavailable.dataValues)[0]) {
+                return Response.errorResponseWithoutData(
+                    res,
+                    SUCCESS,
+                    "You are not available on this day. Check My availability.",
+                    req
+                )
+            }
+
+            let gettime = moment(req.body.time, ['h:m', 'H:m'])
+            let isCreated = await appointment.findAll({where: {date: req.body.date},
+                    include: [{model: docter, where: {id: req.profile.id}}]
+                })
+    
+                isCreated.forEach(element => {
+                if (moment(element.time, ['h:m', 'H:m']).isSame(gettime)) {
+                    throw new Error("You have already created apointment on this Time.")
+                }
+            });
+
+        }
+
+        let data = await appointment.update({status: status }, {where: {id: ApointmentId}})
+        if (data[0] != 0) {
+            return Response.successResponseWithoutData(
+                res,
+                SUCCESS,
+                `Apointment ${status} successfullly.`
+            )
+        } else {
+            return Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                `Error while ${status} Apointment.`,
+                req
+            )
+        }
+    } catch(err) {
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            err.message? err.message: "Error while updating Apointment.",
+            req
+        )
     }
 }
