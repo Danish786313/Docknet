@@ -174,6 +174,7 @@ exports.myApointments = async (req, res) => {
 }
 
 exports.UpdatemyApointments = async (req, res) => {
+    const t = await sequelize.transaction();
     try {
         const { status, ApointmentId } = req.query
         let result = await appointment.findByPk(ApointmentId)
@@ -206,14 +207,16 @@ exports.UpdatemyApointments = async (req, res) => {
 
         }
 
-        let data = await appointment.update({status: status }, {where: {id: ApointmentId}})
+        let data = await appointment.update({status: status }, {where: {id: ApointmentId}, individualHooks: true}, {transaction: t})
         if (data[0] != 0) {
+            await t.commit()
             return Response.successResponseWithoutData(
                 res,
                 SUCCESS,
                 `Apointment ${status} successfullly.`
             )
         } else {
+            await t.rollback()
             return Response.errorResponseWithoutData(
                 res,
                 FAIL,
@@ -222,6 +225,8 @@ exports.UpdatemyApointments = async (req, res) => {
             )
         }
     } catch(err) {
+        await t.rollback()
+        console.log(err)
         return Response.errorResponseWithoutData(
             res,
             FAIL,

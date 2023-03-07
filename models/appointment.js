@@ -27,6 +27,22 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'appointment',
+    hooks: {
+      afterCreate : async (appointment, options) => {
+        await sequelize.models.analytic.create({
+          apointment_id: appointment.id,
+          status: appointment.status,
+          date: sequelize.literal("CURRENT_TIMESTAMP")
+        }, {transaction: options.transaction})
+      },
+      beforeUpdate : async (appointment, options) => {
+        await sequelize.models.analytic.create({
+          apointment_id: appointment.id,
+          status: appointment.status,
+          date: sequelize.literal("CURRENT_TIMESTAMP")
+        }, {transaction: options.transaction})
+      } 
+    }
   });
   return appointment;
 };

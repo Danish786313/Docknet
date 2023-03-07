@@ -34,5 +34,12 @@ exports.UpdateApointmentValidation = (req, res) => {
         query('ApointmentId', 'ApointmentId is Required').notEmpty().isInt().trim(),
         body('date', 'Date is Required').notEmpty().isDate().trim().optional(),
         body('time', 'Time id required').notEmpty().isTime().trim().optional(),
+        query("status").custom(async (value, {req}) => {
+            return await appointment.findOne({ where: { id: req.query.ApointmentId }, raw: true }).then(appointment => {
+                if (appointment.status == value) {
+                    return Promise.reject(`You have already added ${req.query.status} to your application`)
+                }
+            })
+        })
     ]
 }
