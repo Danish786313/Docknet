@@ -490,3 +490,21 @@ npx sequelize-cli model:generate --name health_record --attributes fullName:stri
 
 
 SELECT count(*), patient_name FROM `appointments` GROUP BY date(createdAt)
+
+3312
+
+count every day patients query:-
+select COUNT(id), createdAt FROM appointments WHERE date(createdAt) <= NOW() - INTERVAL 4 DAY;
+count every day patients query:-
+select COUNT(id), createdAt FROM appointments WHERE date(createdAt) >= date('2023-03-03 18:08:11') AND date(createdAt) <= date('2023-03-04 18:08:11');
+
+select SUM(CASE WHEN available = 1 THEN 1 ELSE 0 END) AS available_docters,
+       SUM(CASE WHEN available = 0 THEN 1 ELSE 0 END) AS unavailable_docters FROM availabilities;
+
+onbaorded
+select SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as pending,
+       SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as onbaorded
+FROM count_docters WHERE date(createdAt) >= date('2023-03-10 18:08:11') AND date(createdAt) <= date('2023-03-10 18:08:11');
+
+Highest number of apointments
+SELECT count(docter_id) as number, docter_id FROM docter_patient_appointments AS docter_patient_appointment INNER JOIN appointments AS appointment ON docter_patient_appointment.apointment_id = appointment.id AND appointment.status = 'Upcoming' AND date (docter_patient_appointment.createdAt) >= date('2023-03-10 18:08:11') and date(docter_patient_appointment.createdAt) <= date('2023-03-10 18:08:11') LEFT OUTER JOIN patients AS patient ON docter_patient_appointment.patient_id = patient.id GROUP by docter_id

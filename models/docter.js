@@ -50,6 +50,22 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'docter',
+    hooks: {
+      afterCreate : async (docter, options) => {
+        await sequelize.models.count_docters.create({
+          docter_id: docter.id,
+          status: docter.is_aprove,
+          date: sequelize.literal("CURRENT_TIMESTAMP")
+        }, {transaction: options.transaction})
+      },
+      beforeUpdate : async (docter, options) => {
+        await sequelize.models.count_docters.create({
+          docter_id: docter.id,
+          status: docter.is_aprove,
+          date: sequelize.literal("CURRENT_TIMESTAMP")
+        }, {transaction: options.transaction})
+      } 
+    }
   });
   return docter;
 };

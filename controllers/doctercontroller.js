@@ -35,7 +35,7 @@ exports.docterUpdate = async (req, res) => {
     try {
         reqObj = req.files
         reqObj.profilePicture?  req.body.photo = req.files.profilePicture[0].filename : null;
-        await docter.update(req.body, {where: {id: req.profile.id}}, {transaction: t}).then(async docter => {
+        await docter.update(req.body, {where: {id: req.profile.id}, individualHooks: false}, {transaction: t}).then(async docter => {
             if (docter.length != "0") {
                 docs = {}
                 reqObj.logo? docs.logo = req.files.logo[0].filename : null

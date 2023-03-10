@@ -94,64 +94,57 @@ exports.docterregister = async (req, res) => {
 }
 
 exports.aproveDocter = async (req, res) => {
-    await docter.findOne({where: {email: req.query.email }}).then(async result => {
-        if (result) {
-            await docter.update({is_aprove: true}, {where: {email: req.query.email}}).then(update => {
-                try {
-                        ejs.renderFile(path.join(__dirname, "../views/profileaprove.ejs"), {
-                          name: result.fullName
-                        }).then(async template => {
-                                transporter.sendMail({
-                                    to: req.query.email,
-                                    from: "Docknet",
-                                    subject: "Your profile has been approved by Admin",
-                                    html: template
-                                }).then(async email => {
-                                    return Response.successResponseWithoutData(
-                                        res,
-                                        SUCCESS,
-                                        "profile approved Successfully."
-                                    )
-                                }).catch(async (err) => {
-                                    return Response.errorResponseWithoutData(
-                                        res,
-                                        FAIL,
-                                        "Something went wrong",
-                                        req,
-                                    )
-                                });
-                        }).catch(async (err) =>  { 
-                            return Response.errorResponseWithoutData(
-                                res,
-                                FAIL,
-                                "Something went wrong",
-                                req,
-                            )
-                        })
-                    } catch (err) {
-                        return res.status(400).json({
-                            success: true,
-                            message: "Docter Approved Successfully"
-                        })
-                    }
-            }).catch(err => {
-                return Response.errorResponseWithoutData(
-                    res,
-                    FAIL,
-                    "Something went wrong",
-                    req,
-                )
-            });
+    let t = await sequelize.transaction() 
+    try {
+        let user = await docter.update({is_aprove: req.query.aprove},  {where: {email: req.query.email,}, individualHooks: true}, {transaction: t})
+        if (user[0] != 0) {
+            return res.json("Approved")
+            ejs.renderFile(path.join(__dirname, "../views/profileaprove.ejs"), { name: req.data.fullName }).then(async template => {
+                transporter.sendMail({
+                    to: req.query.email,
+                    from: "Docknet",
+                    subject: "Your profile has been approved by Admin",
+                    html: template
+                }).then(async email => {
+                    await t.commit();
+                    return Response.successResponseWithoutData(
+                        res,
+                        SUCCESS,
+                        "profile approved Successfully."
+                    )
+                }).catch(async (err) => {
+                    console.log(err)
+                    await t.rollback();
+                    return Response.errorResponseWithoutData(
+                        res,
+                        FAIL,
+                        "Something went wrong",
+                        req,
+                    )
+                });
+              }).catch(async (err) =>  {
+                console.log(err);
+                await t.rollback();
+                  return Response.errorResponseWithoutData(
+                      res,
+                      FAIL,
+                      "Something went wrong",
+                      req,
+                  )
+              })
         } else {
-            return res.status(400).json({
-                message: "Email does not exist",
-            })
+            throw new Error("Error updating while trying to approve profile");
         }
-  }).catch(err => {
-      return res.status(400).json({
-          message: "Email does not exist",
-      })
-  });
+    } catch (err) {
+        console.log(err)
+        await t.rollback();
+        return Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            err.message? err.message : "Something went wrong",
+            req,
+        )
+    };
 }
 
 

@@ -84,7 +84,7 @@ exports.updateAvailability = async (req, res) => {
     const t = await sequelize.transaction();
     try {
         let result = await availability.update(req.body, {where: {docter_id: req.profile.id}}, {transaction: t})
-        if (result.length != "0") {
+        if (result[0] != 0) {
             t.commit()
             return Response.successResponseWithoutData(
                 res,
