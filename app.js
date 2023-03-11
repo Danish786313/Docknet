@@ -1,6 +1,5 @@
 const path = require('path');
 const express = require('express')
-const expressLayouts = require('express-ejs-layouts')
 const bodyParser = require('body-parser');
 const morgan = require("morgan");
 const app = express();
@@ -10,8 +9,6 @@ require('dotenv').config()
 const { sequelize } = require('./models');
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
-app.use(expressLayouts)
-app.set('layout', './layouts/default')
 app.set('view engine', 'ejs')
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
@@ -44,8 +41,20 @@ const healthRecord = require("./routes/healthrecordrout")
 app.use(cookieParser());
 app.use(cors())
 
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header(
+        'Access-Control-Allow-Headers', 
+        'Origin, X-Requested-With, Content-Tyoe, Accept, Authorization'
+        )
+    if (req.method === 'OPTIONS') {
+        res.header('Access-Control-Allow-Methods', 'POST, PATCH, DELETE, GET')
+        return res.status(200).json({})
+    }
+    next()
+})
+
 app.get('/test', (req, res) => {
-    console.log(req.body)
     res.status(200).json({
         message: "Hello in test API"
     })
@@ -60,7 +69,7 @@ app.use("/api", availability)
 app.use("/api", apointment)
 app.use("/api", speciality)
 app.use("/api", banner)
-app.use("/payment", payment)
+app.use("/api", payment)
 app.use("/api", region)
 app.use("/api", bankdetail)
 app.use("/api", slots)
@@ -69,15 +78,20 @@ app.use("/api", review)
 app.use("/api", duplicate)
 app.use("/api", healthRecord)
 // app.use("/master/document", express.static("document"));
-app.use(express.static('public'));
-app.use('/images', express.static(__dirname + 'public/images'));
 
-app.use("/razorpay", (req, res) => {
-    res.render('pages/index', { 
-		title: 'Donate for Animals'
-	});
+app.use((req, res, next) => {
+    const error = new Error('Url not found')
+    error.status = 404
+    next(error)
 })
 
+app.use((error, req, res, next) => {
+    res.status(error.status || 500)
+    return res.json({
+            status: false,
+            message: error.message
+    })
+})
 
 const port = (process.env.PORT || 4000)
 

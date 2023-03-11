@@ -23,7 +23,8 @@ module.exports = (sequelize, DataTypes) => {
     age: DataTypes.INTEGER,
     gender: DataTypes.ENUM('Male', 'female', 'Other'),
     problem_desc: DataTypes.TEXT,
-    status: DataTypes.ENUM('Request', 'Cancelled', 'Upcoming', 'Reshedule', 'Emergency', 'Completed')
+    status: DataTypes.ENUM('Request', 'Cancelled', 'Upcoming', 'Reshedule', 'Emergency', 'Completed'),
+    payment: DataTypes.ENUM('Paid', 'Unpaid')
   }, {
     sequelize,
     modelName: 'appointment',

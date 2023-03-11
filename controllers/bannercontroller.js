@@ -17,6 +17,8 @@ exports.getbanner = async (req, res, next, id) => {
 }
 
 exports.create = async (req, res) => {
+    console.log(req.body)
+    console.log(req.file)
     post = {
         image: req.file.path,
         link: req.body.link

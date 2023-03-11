@@ -37,6 +37,11 @@ module.exports = {
         type: Sequelize.ENUM('Request', 'Cancelled', 'Upcoming', 'Reshedule', 'Emergency', 'Completed'),
         allowNull: false,
       },
+      payment: {
+        type: Sequelize.ENUM('Paid', 'Unpaid'),
+        defaultValue: 'Unpaid',
+        allowNull: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
