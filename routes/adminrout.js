@@ -11,4 +11,6 @@ router.get("/docters", admincontroller.getAlldocters)
 
 router.get("/patients", admincontroller.getAllpatients)
 
+router.get("/getAllapointments", admincontroller.apointments)
+
 module.exports = router

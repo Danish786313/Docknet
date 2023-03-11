@@ -508,3 +508,11 @@ FROM count_docters WHERE date(createdAt) >= date('2023-03-10 18:08:11') AND date
 
 Highest number of apointments
 SELECT count(docter_id) as number, docter_id FROM docter_patient_appointments AS docter_patient_appointment INNER JOIN appointments AS appointment ON docter_patient_appointment.apointment_id = appointment.id AND appointment.status = 'Upcoming' AND date (docter_patient_appointment.createdAt) >= date('2023-03-10 18:08:11') and date(docter_patient_appointment.createdAt) <= date('2023-03-10 18:08:11') LEFT OUTER JOIN patients AS patient ON docter_patient_appointment.patient_id = patient.id GROUP by docter_id
+
+
+upd_check 
+
+create trigger IF NOT EXISTS trigger_name AFTER UPDATE ON docters FOR EACH ROW -- IF (UPDATE(is_aprove)) -- 
+BEGIN INSERT INTO count_docters (docter_id, status, date) SELECT id, is_aprove, CURRENT_TIMESTAMP FROM docters -- END;;
+
+create trigger IF NOT EXISTS trigger_name AFTER UPDATE ON docters FOR EACH ROW INSERT INTO count_docters (docter_id, status, date) SELECT id, is_aprove, CURRENT_TIMESTAMP FROM docters WHERE id = id;

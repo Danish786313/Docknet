@@ -222,3 +222,56 @@ exports.getAllpatients = async (req, res) => {
         )
     }
 }
+
+exports.apointments = async (req, res) => {
+    try {
+        const { _page, _limit, status, searchText } = req.query;
+        const { limit, offset } = Helper.getPagination(_page, _limit);
+
+        let where = {}
+        if (searchText) {
+            where = {
+                [Op.or]: [
+                    { name: { [Op.like]: "%" + searchText + "%" } },
+                    { phone: { [Op.like]: "%" + searchText + "%" } },
+                    { email: { [Op.like]: "%" + searchText + "%" } },
+                ],
+            };
+        }
+
+        let data = await docter_patient_appointment.findAndCountAll({
+            limit,
+            offset,
+            // where: {docter_id: req.profile.id}, 
+            include: [
+                {model: appointment,
+                    where: {status: status},
+                },
+                {model:docter, where}
+            ]})
+        const response = Helper.getPagingData(data, _page, limit);
+        if (response.items.length) {
+            Response.successResponseData(
+                res,
+                response,
+                SUCCESS,
+                `${status} apointments fetched successfully.`
+            )
+        } else {
+            Response.errorResponseWithoutData(
+                res,
+                FAIL,
+                `${status} apointments does not exist.`,
+                req
+            )
+        }
+    } catch (err) {
+        console.log(err)
+        Response.errorResponseWithoutData(
+            res,
+            FAIL,
+            `Something went wrong while fetching apointment details.`,
+            req
+        )
+    }
+}
